@@ -29,6 +29,9 @@ public class AuthDto {
         private String email;
 
         @NotBlank
+        private String nickname;
+
+        @NotBlank
         private String pwd;
     }
 

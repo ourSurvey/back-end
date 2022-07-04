@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
         Grade firstGrade = gradeRepo.getFirstGrade();
         User save = repo.save(User.builder().grade(Grade.builder().id(firstGrade.getId()).build())
                 .email(dto.getEmail())
+                .nickname(dto.getNickname())
                 .pwd(dto.getPwd())
                 .build());
 

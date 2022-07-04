@@ -81,7 +81,11 @@ public class AuthController {
             throw new InvalidFormException("invalid form");
         }
 
-        Long joinUser = service.create(UserDto.Create.builder().email(dto.getEmail()).pwd(encoder.encode(dto.getPwd())).build());
+        Long joinUser = service.create(UserDto.Create.builder()
+                .email(dto.getEmail())
+                .nickname(dto.getNickname())
+                .pwd(encoder.encode(dto.getPwd()))
+                .build());
 
         HashMap<String, Long> dataMap = new HashMap<>();
         dataMap.put("user", joinUser);

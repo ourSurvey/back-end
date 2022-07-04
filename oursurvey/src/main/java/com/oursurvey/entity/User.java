@@ -25,6 +25,9 @@ public class User extends CommonDate {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     @Column(name = "pwd", nullable = false)
     private String pwd;
 
@@ -38,10 +41,11 @@ public class User extends CommonDate {
     private String tel;
 
     @Builder
-    public User(Long id, Grade grade, String email, String pwd, Enums gender, LocalDate age, String tel) {
+    public User(Long id, Grade grade, String email, String nickname, String pwd, Enums gender, LocalDate age, String tel) {
         this.id = id;
         this.grade = grade;
         this.email = email;
+        this.nickname = nickname;
         this.pwd = pwd;
         this.gender = gender;
         this.age = age;

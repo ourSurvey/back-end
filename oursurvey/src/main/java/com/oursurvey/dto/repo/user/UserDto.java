@@ -15,6 +15,7 @@ public class UserDto {
         private Long id;
         private GradeDto.Basic grade;
         private String email;
+        private String nickname;
         private String pwd;
         private Enums gender;
         private LocalDate age;
@@ -25,6 +26,7 @@ public class UserDto {
             this.id = entity.getId();
             this.grade = GradeDto.Basic.builder().entity(entity.getGrade()).build();
             this.email = entity.getEmail();
+            // this.email = entity.get();
             this.pwd = entity.getPwd();
             this.gender = entity.getGender();
             this.age = entity.getAge();
@@ -40,6 +42,7 @@ public class UserDto {
     public static class Create {
         private String gradeId;
         private String email;
+        private String nickname;
         private String pwd;
     }
 }
