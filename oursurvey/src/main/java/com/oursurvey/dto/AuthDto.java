@@ -47,4 +47,16 @@ public class AuthDto {
         @NotBlank
         private String code;
     }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class Resetpwd {
+        @NotBlank
+        private String token;
+
+        @NotBlank
+        private String pwd;
+    }
 }

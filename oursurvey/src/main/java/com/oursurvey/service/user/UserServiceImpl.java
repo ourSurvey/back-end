@@ -3,6 +3,7 @@ package com.oursurvey.service.user;
 import com.oursurvey.dto.repo.user.UserDto;
 import com.oursurvey.entity.Grade;
 import com.oursurvey.entity.User;
+import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.repo.grade.GradeRepo;
 import com.oursurvey.repo.user.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,16 @@ public class UserServiceImpl implements UserService {
                 .build());
 
         return save.getId();
+    }
+
+    @Override
+    public void changePwd(String email, String pwd) throws Exception {
+        Optional<User> opt = repo.findByEmail(email);
+        if (opt.isEmpty()) {
+            throw new ObjectNotFoundException();
+        }
+
+        User user = opt.get();
+        user.changePwd(pwd);
     }
 }

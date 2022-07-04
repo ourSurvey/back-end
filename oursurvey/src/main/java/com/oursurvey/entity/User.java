@@ -51,4 +51,9 @@ public class User extends CommonDate {
         this.age = age;
         this.tel = tel;
     }
+
+    // 비밀번호변경
+    public void changePwd(String pwd) {
+        this.pwd = pwd;
+    }
 }

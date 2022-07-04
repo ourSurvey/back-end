@@ -51,13 +51,23 @@ public class JwtUtil {
 
         return tokenDto;
     }
+
     public TokenDto createToken(Long id) {
         return createToken(id, false);
     }
 
+    public String createToken(String str, Integer sec) {
+        long time = new Date().getTime();
+        return Jwts.builder().setSubject("stringToken")
+                .claim("string", str)
+                .setExpiration(new Date(time + (sec * 1000)))
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
-    public Boolean validateToken(String header) {
-        String token = this.extractToken(header);
+
+    public Boolean validateToken(String header, Boolean justString) {
+        String token = justString ? header : this.extractToken(header);
         try {
             Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
             return true;
@@ -74,8 +84,16 @@ public class JwtUtil {
         return false;
     }
 
+    public Boolean validateToken(String header) {
+        return this.validateToken(header, false);
+    }
+
     public Claims parseToken(String header) {
         return Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(this.extractToken(header)).getBody();
+    }
+
+    public Claims parseTokenString(String string) {
+        return Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(string).getBody();
     }
 
     public Long getLoginUserId(String header) {

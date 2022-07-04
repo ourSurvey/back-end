@@ -8,4 +8,6 @@ public interface UserService {
     Optional<UserDto.Basic> findByEmail(String email);
 
     Long create(UserDto.Create dto);
+
+    void changePwd(String email, String pwd) throws Exception;
 }

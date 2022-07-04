@@ -69,7 +69,7 @@ public class AuthController {
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
+        vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.MILLISECONDS);
 
         return res;
     }
@@ -119,6 +119,37 @@ public class AuthController {
             throw new CertifiedException("not matched code");
         }
 
+        return res;
+    }
+
+    // 인증번호 발송
+    @PostMapping("/findpwd")
+    public MyResponse findpwd(@RequestBody String email) throws Exception {
+        MyResponse res = new MyResponse();
+
+        String code = mailUtil.generateAuthCode();
+        mailUtil.sendMail(email, "인증코드", code);
+
+        ValueOperations<String, Object> vop = redis.opsForValue();
+        vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
+
+        HashMap<String, String> dataMap = new HashMap<>();
+        dataMap.put("token", jwtUtil.createToken(email, 300));
+        return res.setData(dataMap);
+    }
+
+    @PostMapping("/resetpwd")
+    public MyResponse resetpwd(@RequestBody AuthDto.Resetpwd dto) throws Exception {
+        MyResponse res = new MyResponse();
+
+        if (!jwtUtil.validateToken(dto.getToken(), true)) {
+            throw new AuthFailException("invalid token");
+        }
+
+        Claims claims = jwtUtil.parseTokenString(dto.getToken());
+        String email = claims.get("string", String.class);
+
+        service.changePwd(email, encoder.encode(dto.getPwd()));
         return res;
     }
 
