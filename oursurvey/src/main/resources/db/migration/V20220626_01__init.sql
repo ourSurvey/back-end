@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `grade_id` bigint NOT NULL,
     `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
     `pwd` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-    `gender` enum('M','F') COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `gender` enum('M','F','E') COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
     `age` date NULL default NULL,
     `tel` varchar(50) COLLATE utf8mb4_general_ci NULL default NULL,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,

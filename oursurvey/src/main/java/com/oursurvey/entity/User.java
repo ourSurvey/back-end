@@ -35,13 +35,13 @@ public class User extends CommonDate {
     private Enums gender;
 
     @Column(name = "age")
-    private LocalDate age;
+    private Integer age;
 
     @Column(name = "tel")
     private String tel;
 
     @Builder
-    public User(Long id, Grade grade, String email, String nickname, String pwd, Enums gender, LocalDate age, String tel) {
+    public User(Long id, Grade grade, String email, String nickname, String pwd, Enums gender, Integer age, String tel) {
         this.id = id;
         this.grade = grade;
         this.email = email;
@@ -53,7 +53,24 @@ public class User extends CommonDate {
     }
 
     // 비밀번호변경
-    public void changePwd(String pwd) {
-        this.pwd = pwd;
+    public void updatePwd(String pwd) {
+        if (pwd != null) {
+            this.pwd = pwd;
+        }
+    }
+
+    // 부가정보변경
+    public void updateAddition(String gender, Integer age, String tel) {
+        if (gender != null) {
+            this.gender = Enums.valueOf(gender);
+        }
+
+        if (age != null) {
+            this.age = age;
+        }
+
+        if (tel != null) {
+            this.tel = tel;
+        }
     }
 }

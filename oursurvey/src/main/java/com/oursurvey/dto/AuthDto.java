@@ -39,6 +39,16 @@ public class AuthDto {
     @ToString
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
+    public static class Addition {
+        private String gender;
+        private Integer age;
+        private String tel;
+    }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
     public static class Certified {
         @Email
         @NotBlank

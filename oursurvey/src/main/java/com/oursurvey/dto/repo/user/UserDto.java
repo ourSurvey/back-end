@@ -5,8 +5,6 @@ import com.oursurvey.entity.Enums;
 import com.oursurvey.entity.User;
 import lombok.*;
 
-import java.time.LocalDate;
-
 public class UserDto {
     @Getter
     @ToString
@@ -18,7 +16,7 @@ public class UserDto {
         private String nickname;
         private String pwd;
         private Enums gender;
-        private LocalDate age;
+        private Integer age;
         private String tel;
 
         @Builder
@@ -44,5 +42,16 @@ public class UserDto {
         private String email;
         private String nickname;
         private String pwd;
+    }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateAddition {
+        private String gender;
+        private Integer age;
+        private String tel;
     }
 }

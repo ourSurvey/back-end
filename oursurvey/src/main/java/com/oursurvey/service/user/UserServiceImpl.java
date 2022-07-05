@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDto.Basic> findByEmail(String email) {
-        Optional<User> opt = repo.findByEmail(email);
+        Optional<User> opt = repo.getByEmail(email);
         if (opt.isEmpty()) {
             return Optional.empty();
         }
@@ -46,13 +46,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePwd(String email, String pwd) throws Exception {
-        Optional<User> opt = repo.findByEmail(email);
+    public void updateAddition(Long id, UserDto.UpdateAddition dto) {
+        User user = repo.getReferenceById(id);
+        if (user == null) {
+            throw new ObjectNotFoundException();
+        }
+
+        user.updateAddition(dto.getGender(), dto.getAge(), dto.getTel());
+    }
+
+    @Override
+    public void updatePwd(String email, String pwd) throws Exception {
+        Optional<User> opt = repo.getByEmail(email);
         if (opt.isEmpty()) {
             throw new ObjectNotFoundException();
         }
 
         User user = opt.get();
-        user.changePwd(pwd);
+        user.updatePwd(pwd);
     }
 }

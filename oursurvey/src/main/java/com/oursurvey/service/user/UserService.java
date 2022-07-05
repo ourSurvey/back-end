@@ -9,5 +9,7 @@ public interface UserService {
 
     Long create(UserDto.Create dto);
 
-    void changePwd(String email, String pwd) throws Exception;
+    void updateAddition(Long id, UserDto.UpdateAddition dto);
+
+    void updatePwd(String email, String pwd) throws Exception;
 }

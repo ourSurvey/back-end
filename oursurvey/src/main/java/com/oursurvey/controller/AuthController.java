@@ -87,9 +87,24 @@ public class AuthController {
                 .pwd(encoder.encode(dto.getPwd()))
                 .build());
 
-        HashMap<String, Long> dataMap = new HashMap<>();
-        dataMap.put("user", joinUser);
+        TokenDto token = jwtUtil.createToken(joinUser, true);
+        HashMap<String, Object> dataMap = new HashMap<>();
+        dataMap.put("tokenType", "Bearer");
+        dataMap.put("access", token.getAccessToken());
+
+        // redis
+        ValueOperations<String, Object> vop = redis.opsForValue();
+        vop.set(REDIS_PREFIX_KEY + joinUser, token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.MILLISECONDS);
         return res.setData(dataMap);
+    }
+
+    @PostMapping("/addition")
+    public MyResponse addition(HttpServletRequest request, @RequestBody AuthDto.Addition dto) {
+        MyResponse res = new MyResponse();
+
+        Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+        service.updateAddition(id, UserDto.UpdateAddition.builder().gender(dto.getGender()).age(dto.getAge()).tel(dto.getTel()).build());
+        return res;
     }
 
     // 인증번호 발송
@@ -149,7 +164,7 @@ public class AuthController {
         Claims claims = jwtUtil.parseTokenString(dto.getToken());
         String email = claims.get("string", String.class);
 
-        service.changePwd(email, encoder.encode(dto.getPwd()));
+        service.updatePwd(email, encoder.encode(dto.getPwd()));
         return res;
     }
 

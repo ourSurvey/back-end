@@ -1,6 +1,5 @@
 package com.oursurvey.repo.user;
 
-import com.oursurvey.entity.QGrade;
 import com.oursurvey.entity.User;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,7 +21,7 @@ public class UserRepoImpl implements UserRepoCustom {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> getByEmail(String email) {
         return Optional.ofNullable(getBaseJoin().where(user.email.eq(email)).fetchOne());
     }
 }
