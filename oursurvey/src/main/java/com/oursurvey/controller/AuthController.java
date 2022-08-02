@@ -109,9 +109,10 @@ public class AuthController {
 
     // 인증번호 발송
     @PostMapping("/take")
-    public MyResponse take(@RequestBody String email) throws Exception {
+    public MyResponse take(@RequestBody HashMap<String, String> map) throws Exception {
         MyResponse res = new MyResponse();
 
+        String email = map.get("email");
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
@@ -139,9 +140,10 @@ public class AuthController {
 
     // 인증번호 발송
     @PostMapping("/findpwd")
-    public MyResponse findpwd(@RequestBody String email) throws Exception {
+    public MyResponse findpwd(@RequestBody HashMap<String, String> map) throws Exception {
         MyResponse res = new MyResponse();
 
+        String email = map.get("email");
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
