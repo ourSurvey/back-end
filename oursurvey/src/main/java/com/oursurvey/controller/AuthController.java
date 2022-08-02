@@ -69,9 +69,9 @@ public class AuthController {
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.MILLISECONDS);
+        vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
 
-        return res;
+        return res.setData(dataMap);
     }
 
     @PostMapping("/join")
@@ -79,6 +79,11 @@ public class AuthController {
         MyResponse res = new MyResponse();
         if (br.hasFieldErrors()) {
             throw new InvalidFormException("invalid form");
+        }
+
+        Optional<UserDto.Basic> existMail = service.findByEmail(dto.getEmail());
+        if (existMail.isPresent()) {
+            throw new DuplicateEmailException("duplicate email");
         }
 
         Long joinUser = service.create(UserDto.Create.builder()
@@ -94,7 +99,7 @@ public class AuthController {
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + joinUser, token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.MILLISECONDS);
+        vop.set(REDIS_PREFIX_KEY + joinUser, token.getAccessToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
         return res.setData(dataMap);
     }
 
@@ -111,12 +116,12 @@ public class AuthController {
     @PostMapping("/take")
     public MyResponse take(@RequestBody HashMap<String, String> map) throws Exception {
         MyResponse res = new MyResponse();
-
         String email = map.get("email");
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
         ValueOperations<String, Object> vop = redis.opsForValue();
+        System.out.println("ddd = " + (String) vop.get("ddd"));
         vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
         return res;
     }

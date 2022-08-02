@@ -17,9 +17,9 @@ import java.util.Date;
 public class JwtUtil {
     @Value("${jwt.key}")
     private String jwtKey;
-    private static final int ACCESS_TOKEN_PERIOD = 1000 * 60 * 60 * 3; // 3 hour
+    private static final int ACCESS_TOKEN_PERIOD = 60 * 60 * 3; // 3 hour
 
-    public static final int REFRESH_TOKEN_PERIOD = 1000 * 60 * 60 * 24 * 7; // 7 days
+    public static final int REFRESH_TOKEN_PERIOD = 60 * 60 * 24 * 7; // 7 days
 
     private Key getKey() {
         return Keys.hmacShaKeyFor(this.jwtKey.getBytes(StandardCharsets.UTF_8));
@@ -33,7 +33,7 @@ public class JwtUtil {
                 .setSubject("accessToken")
                 .claim("id", id)
                 .claim("tokenType", "access")
-                .setExpiration(new Date(time + ACCESS_TOKEN_PERIOD))
+                .setExpiration(new Date(System.currentTimeMillis() + (REFRESH_TOKEN_PERIOD * 1000)))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact());
 
@@ -42,7 +42,7 @@ public class JwtUtil {
                     .setSubject("refreshToken")
                     .claim("id", id)
                     .claim("tokenType", "refresh")
-                    .setExpiration(new Date(time + REFRESH_TOKEN_PERIOD))
+                    .setExpiration(new Date(System.currentTimeMillis() + (REFRESH_TOKEN_PERIOD * 1000)))
                     .signWith(getKey(), SignatureAlgorithm.HS256)
                     .compact());
 

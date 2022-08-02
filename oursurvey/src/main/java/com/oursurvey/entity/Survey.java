@@ -5,7 +5,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,10 +29,10 @@ public class Survey extends CommonDate {
     private Integer minute;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(name = "open_fl", columnDefinition = "TINYINT(3)", nullable = false)
     private Integer openFl;
@@ -41,7 +41,8 @@ public class Survey extends CommonDate {
     private String closingComment;
 
     @Builder
-    public Survey(User user, String subject, Integer minute, LocalDateTime startDate, LocalDateTime endDate, Integer openFl, String closingComment) {
+    public Survey(Long id, User user, String subject, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, String closingComment) {
+        this.id = id;
         this.user = user;
         this.subject = subject;
         this.minute = minute;

@@ -40,7 +40,8 @@ public class Question extends CommonDate {
     private Integer essFl;
 
     @Builder
-    public Question(Section section, String ask, String explain, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
+    public Question(Long id, Section section, String ask, String explain, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
+        this.id = id;
         this.section = section;
         this.ask = ask;
         this.explain = explain;

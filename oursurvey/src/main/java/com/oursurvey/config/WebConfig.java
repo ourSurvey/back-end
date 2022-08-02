@@ -46,6 +46,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/auth/join",
                         "/api/auth/take",
                         "/api/auth/certified",
+                        "/api/auth/findpwd",
+                        "/api/auth/resetpwd",
                         "/api/auth/refresh"
                 );
     }

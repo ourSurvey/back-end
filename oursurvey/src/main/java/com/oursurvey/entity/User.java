@@ -32,6 +32,7 @@ public class User extends CommonDate {
     private String pwd;
 
     @Column(name = "gender", columnDefinition = "ENUM")
+    @Enumerated(EnumType.STRING)
     private Enums gender;
 
     @Column(name = "age")

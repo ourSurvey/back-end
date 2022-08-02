@@ -20,5 +20,9 @@ public class SurveyDto {
         private Integer openFl;
         private String closingComment;
         private List<SectionDto.Create> sectionList;
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
     }
 }

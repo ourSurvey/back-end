@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Long create(UserDto.Create dto) {
         Grade firstGrade = gradeRepo.getFirstGrade();
         User save = repo.save(User.builder().grade(Grade.builder().id(firstGrade.getId()).build())
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateAddition(Long id, UserDto.UpdateAddition dto) {
         User user = repo.getReferenceById(id);
         if (user == null) {
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updatePwd(String email, String pwd) throws Exception {
         Optional<User> opt = repo.getByEmail(email);
         if (opt.isEmpty()) {

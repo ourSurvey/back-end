@@ -28,7 +28,8 @@ public class Section extends CommonDate {
     private Long nextSection=0L;
 
     @Builder
-    public Section(Survey survey, String title, Long nextSection) {
+    public Section(Long id, Survey survey, String title, Long nextSection) {
+        this.id = id;
         this.survey = survey;
         this.title = title;
         this.nextSection = nextSection;

@@ -17,6 +17,7 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
             AuthFailException.class,
+            DuplicateEmailException.class,
             InvalidFormException.class,
             InvalidTokenException.class,
             InvalidAccessTokenException.class,
@@ -26,6 +27,7 @@ public class ExceptionAdvice {
     })
     public MyResponse exceptionFor400(Exception e) {
         MyResponse myResponse = new MyResponse().setCode(MyResponse.CLIENT_ERROR).setMessage(e.getMessage());
+        if (e instanceof DuplicateEmailException) myResponse.setCode(MyResponse.DUPLICATE_EMAIL);
         if (e instanceof InvalidTokenException) myResponse.setCode(MyResponse.INVALID_TOKEN);
         if (e instanceof InvalidAccessTokenException) myResponse.setCode(MyResponse.INVALID_ACCESSTOKEN);
         if (e instanceof InvalidRefreshTokenException) myResponse.setCode(MyResponse.INVALID_REFRESHTOKEN);
