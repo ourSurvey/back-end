@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Random;
 
@@ -22,8 +23,11 @@ public class MailUtil {
     public void sendMail(String to, String subject, String content) throws Exception {
         MimeMessage mail = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mail, true, "UTF-8");
+        InternetAddress internetAddress = new InternetAddress();
+        internetAddress.setAddress(to);
+
         helper.setFrom(FROM);
-        helper.setTo(to);
+        helper.setTo(internetAddress);
         helper.setSubject(subject);
         helper.setText(content, true);
         mailSender.send(mail);
