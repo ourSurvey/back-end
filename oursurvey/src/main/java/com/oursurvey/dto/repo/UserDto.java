@@ -1,6 +1,6 @@
-package com.oursurvey.dto.repo.user;
+package com.oursurvey.dto.repo;
 
-import com.oursurvey.dto.repo.grade.GradeDto;
+import com.oursurvey.dto.repo.GradeDto;
 import com.oursurvey.entity.Enums;
 import com.oursurvey.entity.User;
 import lombok.*;

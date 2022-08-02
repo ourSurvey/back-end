@@ -1,6 +1,6 @@
 package com.oursurvey.service.user;
 
-import com.oursurvey.dto.repo.user.UserDto;
+import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Grade;
 import com.oursurvey.entity.User;
 import com.oursurvey.exception.ObjectNotFoundException;

@@ -3,7 +3,7 @@ package com.oursurvey.controller;
 import com.oursurvey.dto.AuthDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.TokenDto;
-import com.oursurvey.dto.repo.user.UserDto;
+import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.exception.*;
 import com.oursurvey.service.user.UserService;
 import com.oursurvey.util.JwtUtil;

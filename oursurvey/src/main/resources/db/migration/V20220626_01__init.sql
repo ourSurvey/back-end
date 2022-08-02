@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `grade_id` bigint NOT NULL,
     `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
     `pwd` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-    `gender` enum('M','F','E') COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `gender` enum('M','F') COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
     `age` date NULL default NULL,
     `tel` varchar(50) COLLATE utf8mb4_general_ci NULL default NULL,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -93,8 +93,10 @@ CREATE TABLE IF NOT EXISTS `experience` (
 
 CREATE TABLE IF NOT EXISTS `survey` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-    `user_id` bigint NOT NULL,
+    `user_id` bigint,
     `subject` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+    `content` TEXT NOT NULL COLLATE utf8mb4_general_ci,
+    `minute` INT(10) NOT NULL,
     `start_date` datetime NOT NULL,
     `end_date` datetime NOT NULL,
     `open_fl` tinyint NOT NULL,
@@ -119,7 +121,8 @@ CREATE TABLE IF NOT EXISTS `top_survey` (
 CREATE TABLE IF NOT EXISTS `section` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `survey_id` bigint NOT NULL,
-    `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+    `title` VARCHAR(255) NULL DEFAULT NULL COLLATE utf8mb4_general_ci,
+    `content` VARCHAR(255) NULL DEFAULT NULL COLLATE utf8mb4_general_ci,
     `next_section` bigint NOT NULL DEFAULT '0',
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -203,34 +206,3 @@ CREATE TABLE IF NOT EXISTS `answer` (
     CONSTRAINT `FK_answer_question_item` FOREIGN KEY (`question_item_id`) REFERENCES `question_item` (`id`) ON DELETE RESTRICT,
     CONSTRAINT `FK_answer_reply` FOREIGN KEY (`reply_id`) REFERENCES `reply` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

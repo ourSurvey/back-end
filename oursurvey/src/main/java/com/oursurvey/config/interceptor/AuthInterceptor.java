@@ -41,6 +41,8 @@ public class AuthInterceptor implements HandlerInterceptor {
     // excludePathPatterns에서 method로 못잡을 경우 사용
     private final List<String> whiteList = Arrays.asList(
             // ex. GET:/api/example
+            "GET:/api/survey",
+            "POST:/api/survey"
     );
 
     @Override

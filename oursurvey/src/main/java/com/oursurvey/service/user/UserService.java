@@ -1,6 +1,6 @@
 package com.oursurvey.service.user;
 
-import com.oursurvey.dto.repo.user.UserDto;
+import com.oursurvey.dto.repo.UserDto;
 
 import java.util.Optional;
 

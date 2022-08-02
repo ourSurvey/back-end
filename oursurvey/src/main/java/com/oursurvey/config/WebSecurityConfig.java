@@ -19,9 +19,7 @@ public class WebSecurityConfig {
         http.formLogin().disable();
         http.cors().configurationSource(request -> {
             var cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of(
-                    "http://localhost:3000"
-            ));
+            cors.setAllowedOrigins(List.of("*"));
             cors.setAllowedHeaders(List.of("*"));
             cors.setAllowedMethods(List.of("*"));
             return cors;

@@ -1,9 +1,6 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -27,6 +24,9 @@ public class Question extends CommonDate {
     @Column(name = "ask", nullable = false)
     private String ask;
 
+    @Column(name = "explain")
+    private String explain;
+
     @Column(name = "oder", nullable = false)
     private Integer oder;
 
@@ -39,6 +39,14 @@ public class Question extends CommonDate {
     @Column(name = "ess_fl", columnDefinition = "TINYINT(3)", nullable = false)
     private Integer essFl;
 
-    @Column(name = "explain")
-    private String explain;
+    @Builder
+    public Question(Section section, String ask, String explain, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
+        this.section = section;
+        this.ask = ask;
+        this.explain = explain;
+        this.oder = oder;
+        this.multiFl = multiFl;
+        this.duplFl = duplFl;
+        this.essFl = essFl;
+    }
 }

@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -16,11 +17,13 @@ import javax.persistence.EntityManager;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Bean
+    @Primary
     PasswordEncoder getBCryptEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
+    @Primary
     JPAQueryFactory getJPAQueryFactory(EntityManager em) {;
         return new JPAQueryFactory(em);
     }
@@ -64,7 +67,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:3000"
+                        "*"
                 )
                 .allowedHeaders(
                         "*"

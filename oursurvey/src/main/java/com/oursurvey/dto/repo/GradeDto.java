@@ -1,4 +1,4 @@
-package com.oursurvey.dto.repo.grade;
+package com.oursurvey.dto.repo;
 
 import com.oursurvey.entity.Grade;
 import lombok.*;

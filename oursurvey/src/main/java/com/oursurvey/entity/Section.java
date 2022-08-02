@@ -1,9 +1,6 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -29,4 +26,11 @@ public class Section extends CommonDate {
 
     @Column(name = "next_section", nullable = false)
     private Long nextSection=0L;
+
+    @Builder
+    public Section(Survey survey, String title, Long nextSection) {
+        this.survey = survey;
+        this.title = title;
+        this.nextSection = nextSection;
+    }
 }

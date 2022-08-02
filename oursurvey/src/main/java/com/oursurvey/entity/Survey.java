@@ -1,9 +1,6 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -22,11 +19,14 @@ public class Survey extends CommonDate {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "subject", nullable = false)
     private String subject;
+
+    @Column(name = "minute", nullable = false)
+    private Integer minute;
 
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
@@ -39,4 +39,15 @@ public class Survey extends CommonDate {
 
     @Column(name = "closing_comment")
     private String closingComment;
+
+    @Builder
+    public Survey(User user, String subject, Integer minute, LocalDateTime startDate, LocalDateTime endDate, Integer openFl, String closingComment) {
+        this.user = user;
+        this.subject = subject;
+        this.minute = minute;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.openFl = openFl;
+        this.closingComment = closingComment;
+    }
 }
