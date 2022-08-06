@@ -6,13 +6,18 @@ import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -78,4 +83,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "*"
                 );
     }
+
+    // @Override
+    // public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+    //     SortHandlerMethodArgumentResolver sortArgumentResolver = new SortHandlerMethodArgumentResolver();
+    //     sortArgumentResolver.setSortParameter("sortBy");
+    //     sortArgumentResolver.setPropertyDelimiter("-");
+    //     PageableHandlerMethodArgumentResolver pageableArgumentResolver = new PageableHandlerMethodArgumentResolver(sortArgumentResolver);
+    //     pageableArgumentResolver.setOneIndexedParameters(true);
+    //     pageableArgumentResolver.setMaxPageSize(20);
+    //     pageableArgumentResolver.setFallbackPageable(PageRequest.of(0,10));
+    //     resolvers.add(pageableArgumentResolver);
+    // }
 }

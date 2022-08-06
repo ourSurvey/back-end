@@ -3,8 +3,13 @@ package com.oursurvey.controller;
 import com.oursurvey.dto.AuthDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.TokenDto;
+import com.oursurvey.dto.repo.LoggedInDto;
+import com.oursurvey.dto.repo.PointDto;
 import com.oursurvey.dto.repo.UserDto;
+import com.oursurvey.entity.Point;
 import com.oursurvey.exception.*;
+import com.oursurvey.service.loggedin.LoggedInService;
+import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.user.UserService;
 import com.oursurvey.util.JwtUtil;
 import com.oursurvey.util.MailUtil;
@@ -21,6 +26,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.DateFormatter;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final UserService service;
+    private final PointService pointService;
+    private final LoggedInService logService;
     private final MailUtil mailUtil;
 
     private final PasswordEncoder encoder;
@@ -44,7 +55,7 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/login")
-    public MyResponse login(@Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
+    public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
         MyResponse res = new MyResponse();
         if (br.hasFieldErrors()) {
             throw new InvalidFormException("invalid form");
@@ -70,6 +81,24 @@ public class AuthController {
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
         vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
+
+        // log & point
+        Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        if (logOpt.isEmpty()) {
+            // save log
+            logService.create(LoggedInDto.Create.builder().userId(user.getId()).remoteAddr(request.getRemoteAddr()).build());
+
+            // save point
+            pointService.create(PointDto.Create.builder()
+                    .userId(user.getId())
+                    .value(Point.LOGIN_VALUE)
+                    .reason(Point.LOGIN_REASON)
+                    .tablePk(user.getId())
+                    .tableName("user")
+                    .build());
+
+            dataMap.put("savedPoint", Point.LOGIN_VALUE);
+        }
 
         return res.setData(dataMap);
     }

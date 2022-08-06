@@ -7,7 +7,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "survey")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"user"})
@@ -16,14 +16,18 @@ import java.time.LocalDate;
 public class Survey extends CommonDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "subject", nullable = false)
     private String subject;
+
+    @Column(name = "content", nullable = false)
+    private String content;
 
     @Column(name = "minute", nullable = false)
     private Integer minute;
@@ -41,10 +45,11 @@ public class Survey extends CommonDate {
     private String closingComment;
 
     @Builder
-    public Survey(Long id, User user, String subject, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, String closingComment) {
+    public Survey(Long id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, String closingComment) {
         this.id = id;
         this.user = user;
         this.subject = subject;
+        this.content = getContent();
         this.minute = minute;
         this.startDate = startDate;
         this.endDate = endDate;

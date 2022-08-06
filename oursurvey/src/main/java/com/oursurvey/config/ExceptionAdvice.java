@@ -1,4 +1,4 @@
-package com.oursurvey.config.advice;
+package com.oursurvey.config;
 
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.exception.*;

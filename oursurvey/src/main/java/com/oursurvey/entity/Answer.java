@@ -9,7 +9,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "answer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"reply", "question", "questionItem"})
@@ -18,6 +18,7 @@ import javax.persistence.*;
 public class Answer extends CommonDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

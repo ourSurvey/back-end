@@ -12,6 +12,8 @@ import com.oursurvey.repo.survey.SurveyRepo;
 import com.oursurvey.service.section.SectionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class SurveyServiceImpl implements SurveyService {
         Survey saveSurvey = repo.save(Survey.builder()
                 .user(User.builder().id(dto.getUserId()).build())
                 .subject(dto.getSubject())
+                .content(dto.getContent())
                 .minute(dto.getMinute())
                 .startDate(LocalDate.parse(dto.getStartDate()))
                 .endDate(LocalDate.parse(dto.getEndDate()))
@@ -73,5 +76,10 @@ public class SurveyServiceImpl implements SurveyService {
         });
 
         return saveSurvey.getId();
+    }
+
+    @Override
+    public Page<SurveyDto.Lizt> find(Pageable pageable) {
+        return repo.get(pageable);
     }
 }

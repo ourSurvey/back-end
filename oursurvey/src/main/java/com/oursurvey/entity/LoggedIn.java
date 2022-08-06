@@ -1,15 +1,12 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "logged_in")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"user"})
@@ -18,6 +15,7 @@ import javax.persistence.*;
 public class LoggedIn extends CommonDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,4 +24,11 @@ public class LoggedIn extends CommonDate {
 
     @Column(name = "remote_addr", nullable = false)
     private String remoteAddr;
+
+    @Builder
+    public LoggedIn(Long id, User user, String remoteAddr) {
+        this.id = id;
+        this.user = user;
+        this.remoteAddr = remoteAddr;
+    }
 }

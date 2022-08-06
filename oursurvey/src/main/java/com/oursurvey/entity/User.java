@@ -3,11 +3,12 @@ package com.oursurvey.entity;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"grade"})
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 public class User extends CommonDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -62,7 +64,7 @@ public class User extends CommonDate {
 
     // 부가정보변경
     public void updateAddition(String gender, Integer age, String tel) {
-        if (gender != null) {
+        if (StringUtils.hasText(gender)) {
             this.gender = Enums.valueOf(gender);
         }
 
@@ -70,7 +72,7 @@ public class User extends CommonDate {
             this.age = age;
         }
 
-        if (tel != null) {
+        if (StringUtils.hasText(tel)) {
             this.tel = tel;
         }
     }

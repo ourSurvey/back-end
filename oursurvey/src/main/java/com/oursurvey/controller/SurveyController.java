@@ -1,10 +1,9 @@
 package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
-import com.oursurvey.dto.repo.QuestionDto;
-import com.oursurvey.dto.repo.QuestionItemDto;
-import com.oursurvey.dto.repo.SectionDto;
-import com.oursurvey.dto.repo.SurveyDto;
+import com.oursurvey.dto.repo.*;
+import com.oursurvey.entity.Point;
+import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.survey.SurveyService;
 import com.oursurvey.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,23 +25,33 @@ import java.util.List;
 @RequestMapping("/api/survey")
 @RequiredArgsConstructor
 public class SurveyController {
-    private final JwtUtil jwtUtil;
     private final SurveyService surveyService;
+    private final PointService pointService;
+    private final JwtUtil jwtUtil;
+
 
     @PostMapping
     public MyResponse create(HttpServletRequest request, @RequestBody String json) {
         MyResponse res = new MyResponse();
 
+        Long loginUserId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+
         JSONObject object = new JSONObject(json);
         SurveyDto.Create surveyDto = getSurveyFromJson(object);
+        surveyDto.setUserId(loginUserId);
 
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header != null) {
-            Long loginUserId = jwtUtil.getLoginUserId(header);
-            surveyDto.setUserId(loginUserId);
-        }
+        // save survey
+        Long surveyId = surveyService.create(surveyDto);
 
-        Long save = surveyService.create(surveyDto);
+        // save point
+        Integer survey = pointService.create(PointDto.Create.builder()
+                .userId(loginUserId)
+                .value(Point.CREATE_SURVEY_VALUE)
+                .reason(Point.CREATE_SURVEY_REASON)
+                .tablePk(surveyId)
+                .tableName("survey")
+                .build());
+
         return res;
     }
 

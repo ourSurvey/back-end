@@ -6,26 +6,26 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.ManyToAny;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-@Entity(name = "reply")
+@Entity(name = "hashtag_survey")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString(exclude = {"user", "survey"})
+@ToString
 @DynamicInsert
 @DynamicUpdate
-public class Reply extends CommonDate {
+@IdClass(HashtagSurvey.class)
+public class HashtagSurvey implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", nullable = false)
     private Survey survey;
+
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hashtag_id", nullable = false)
+    private Hashtag hashtag;
 }

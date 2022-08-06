@@ -1,7 +1,10 @@
 package com.oursurvey.dto.repo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class SurveyDto {
@@ -24,5 +27,23 @@ public class SurveyDto {
         public void setUserId(Long userId) {
             this.userId = userId;
         }
+    }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class Lizt {
+        private String subject;
+        private String content;
+        private Integer openFl;
+        private Integer minute;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate startDate;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate endDate;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDateTime createdDt;
+        private String hashtagList;
     }
 }

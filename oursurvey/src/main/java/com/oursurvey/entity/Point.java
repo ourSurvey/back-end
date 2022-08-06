@@ -1,23 +1,30 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "point")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"user"})
 @DynamicInsert
 @DynamicUpdate
 public class Point extends CommonDate {
+    public final static Integer LOGIN_VALUE = 30;
+    public final static String LOGIN_REASON = "LOGIN";
+
+    public final static Integer CREATE_SURVEY_VALUE = -1000;
+    public final static String CREATE_SURVEY_REASON = "CREATE_SURVEY";
+
+    public final static Integer REPLY_SURVEY_VALUE = 300;
+    public final static String REPLY_SURVEY_REASON = "REPLY_SURVEY";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,4 +42,14 @@ public class Point extends CommonDate {
 
     @Column(name = "table_name")
     private String tableName="";
+
+    @Builder
+    public Point(Long id, User user, Integer value, String reason, Long tablePk, String tableName) {
+        this.id = id;
+        this.user = user;
+        this.value = value;
+        this.reason = reason;
+        this.tablePk = tablePk;
+        this.tableName = tableName;
+    }
 }

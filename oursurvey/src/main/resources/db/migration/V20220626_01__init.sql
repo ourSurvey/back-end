@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `experience` (
 
 CREATE TABLE IF NOT EXISTS `survey` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-    `user_id` bigint,
+    `user_id` bigint NOT NULL,
     `subject` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
     `content` TEXT NOT NULL COLLATE utf8mb4_general_ci,
     `minute` INT(10) NOT NULL,

@@ -1,6 +1,5 @@
 package com.oursurvey.config.interceptor;
 
-
 import com.oursurvey.exception.AuthFailException;
 import com.oursurvey.exception.InvalidAccessTokenException;
 import com.oursurvey.exception.InvalidRefreshTokenException;
@@ -41,8 +40,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     // excludePathPatterns에서 method로 못잡을 경우 사용
     private final List<String> whiteList = Arrays.asList(
             // ex. GET:/api/example
-            "GET:/api/survey",
-            "POST:/api/survey"
+            "GET:/api/survey"
     );
 
     @Override
