@@ -1,0 +1,32 @@
+schema {
+    query: Query,
+#    mutation: Mutation
+}
+
+type SurveyDto {
+    subject: String!,
+    content: String!,
+    openFl: Int!,
+    minute: Int!,
+    startDate: String!,
+    endDate: String!,
+    createdDt: String!,
+    hashtagList: String
+}
+
+type Page {
+    totalElements: Int!,
+    totalPages: Int!,
+    isLast: Boolean!,
+    content: [SurveyDto]
+}
+
+type MyResponse {
+    code: Int!,
+    message: String,
+    data: Page
+}
+
+type Query {
+    getSurveyToPage(page: Int!, size: Int!): MyResponse,
+}

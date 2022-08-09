@@ -52,8 +52,6 @@ public class AuthInterceptor implements HandlerInterceptor {
             }
         }
 
-        log.info("requestUri = {}", requestUri);
-
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null) {
             throw new AuthFailException("invalid header");

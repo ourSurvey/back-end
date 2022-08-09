@@ -10,14 +10,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +32,24 @@ public class SurveyController {
     private final PointService pointService;
     private final JwtUtil jwtUtil;
 
+    @SchemaMapping(typeName = "Query", value = "testtest")
+    public Integer testtest() {
+        return 1;
+    }
+
+    @SchemaMapping(typeName = "Query", value = "getSurveyToPage")
+    public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size) {
+        MyResponse res = new MyResponse();
+
+        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size));
+        HashMap<String, Object> dataMap = new HashMap<>();
+
+        dataMap.put("totalElements", lizts.getTotalElements());
+        dataMap.put("totalPages", lizts.getTotalPages());
+        dataMap.put("isLast", lizts.isLast());
+        dataMap.put("content", lizts.getContent());
+        return res.setData(dataMap);
+    }
 
     @PostMapping
     public MyResponse create(HttpServletRequest request, @RequestBody String json) {

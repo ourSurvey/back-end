@@ -19,5 +19,7 @@ class SurveyServiceImplTest {
     @Test
     void test() {
         Page<SurveyDto.Lizt> list = service.find(PageRequest.of(0, 10));
+        List<SurveyDto.Lizt> content = list.getContent();
+        System.out.println("content = " + content);
     }
 }

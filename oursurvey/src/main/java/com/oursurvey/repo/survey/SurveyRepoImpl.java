@@ -41,14 +41,14 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
                                 ExpressionUtils.template(String.class, "GROUP_CONCAT({0})", hashtag.value)
                         )
                 ).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
-                .join(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
+                .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .groupBy(survey.id)
                 .orderBy(survey.createDt.desc());
 
         JPAQuery<Long> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
-                .join(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
+                .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
                 .groupBy(survey.id)
                 .orderBy(survey.createDt.desc());
 
