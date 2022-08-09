@@ -30,4 +30,10 @@ public class PointServiceImpl implements PointService {
         // 적립된 포인트 리턴
         return save.getValue();
     }
+
+    @Override
+    public Integer findSumByUserId(Long id) {
+        Integer sum = repo.getSumByUserId(id);
+        return sum == null ? 0 : sum;
+    }
 }

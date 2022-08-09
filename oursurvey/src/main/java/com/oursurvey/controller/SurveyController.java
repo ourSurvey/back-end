@@ -3,6 +3,7 @@ package com.oursurvey.controller;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.Point;
+import com.oursurvey.exception.PointLackException;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.survey.SurveyService;
 import com.oursurvey.util.JwtUtil;
@@ -32,11 +33,6 @@ public class SurveyController {
     private final PointService pointService;
     private final JwtUtil jwtUtil;
 
-    @SchemaMapping(typeName = "Query", value = "testtest")
-    public Integer testtest() {
-        return 1;
-    }
-
     @SchemaMapping(typeName = "Query", value = "getSurveyToPage")
     public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size) {
         MyResponse res = new MyResponse();
@@ -51,22 +47,27 @@ public class SurveyController {
         return res.setData(dataMap);
     }
 
+    // NOTE. [point -1000]
     @PostMapping
     public MyResponse create(HttpServletRequest request, @RequestBody String json) {
         MyResponse res = new MyResponse();
 
-        Long loginUserId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+        Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+        Integer sumPoint = pointService.findSumByUserId(id);
+        if (sumPoint < 1000) {
+            throw new PointLackException("lack point");
+        }
 
         JSONObject object = new JSONObject(json);
         SurveyDto.Create surveyDto = getSurveyFromJson(object);
-        surveyDto.setUserId(loginUserId);
+        surveyDto.setUserId(id);
 
         // save survey
         Long surveyId = surveyService.create(surveyDto);
 
         // save point
         Integer survey = pointService.create(PointDto.Create.builder()
-                .userId(loginUserId)
+                .userId(id)
                 .value(Point.CREATE_SURVEY_VALUE)
                 .reason(Point.CREATE_SURVEY_REASON)
                 .tablePk(surveyId)

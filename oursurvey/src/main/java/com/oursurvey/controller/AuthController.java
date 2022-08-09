@@ -42,18 +42,18 @@ public class AuthController {
     private final UserService service;
     private final PointService pointService;
     private final LoggedInService logService;
-    private final MailUtil mailUtil;
 
     private final PasswordEncoder encoder;
-    private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redis;
+    private final JwtUtil jwtUtil;
+    private final MailUtil mailUtil;
 
     @Value("${spring.redis.prefix.key}")
     private String REDIS_PREFIX_KEY;
     @Value("${spring.mail.prefix.key}")
     private String MAIL_PREFIX_KEY;
 
-    // 로그인
+    // NOTE. [point +30]
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
         MyResponse res = new MyResponse();
