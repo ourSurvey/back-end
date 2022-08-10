@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
@@ -43,9 +45,17 @@ public class AuthInterceptor implements HandlerInterceptor {
             "GET:/api/survey"
     );
 
+    private List<String> permit = List.of("active", "auth", "point", "survey");
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String requestUri = request.getRequestURI();
+        Optional<String> first = permit.stream().filter(requestUri::contains).findFirst();
+        if (first.isEmpty()) {
+            response.sendRedirect("/error");
+            return false;
+        }
+
         for (String element : whiteList) {
             if (element.startsWith(request.getMethod()) && element.split(":")[1].equals(requestUri)) {
                 return true;
