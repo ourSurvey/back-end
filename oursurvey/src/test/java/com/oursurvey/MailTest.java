@@ -12,6 +12,6 @@ public class MailTest {
 
     @Test
     void test() throws Exception {
-        mailUtil.sendMail("eikhyeon8542@naver.com", "111", "2222");
+        // mailUtil.sendMail("eikhyeon8542@naver.com", "111", "2222");
     }
 }
