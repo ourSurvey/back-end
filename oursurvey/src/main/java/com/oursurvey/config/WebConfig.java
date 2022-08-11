@@ -45,15 +45,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "/index.html",
                         "/",
                         "/null",
-                        "/api/test/**",
-                        "/api/auth/login",
-                        "/api/auth/logout",
-                        "/api/auth/join",
-                        "/api/auth/take",
-                        "/api/auth/certified",
-                        "/api/auth/findpwd",
-                        "/api/auth/resetpwd",
-                        "/api/auth/refresh",
+                        "/api/test/**",        // 테스트
+                        "/api/auth/login",     // 로그인
+                        "/api/auth/logout",    // 로그아웃
+                        "/api/auth/join",      // 가입
+                        "/api/auth/take",      // 인증번호 전송
+                        "/api/auth/certified", // 인증번호 확인
+                        "/api/auth/findpwd",   // 비밀번호 찾기
+                        "/api/auth/resetpwd",  // 비밀번호 초기화
+                        "/api/auth/refresh",   // access 토큰 재발급
+                        "/api/auth/validate",  // access 토큰 검증
                         "/graphql",
                         "/graphiql"
                 );

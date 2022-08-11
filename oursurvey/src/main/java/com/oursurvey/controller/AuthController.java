@@ -252,4 +252,28 @@ public class AuthController {
         return res.setData(dataMap);
     }
 
+    @GetMapping("/validate")
+    public MyResponse validate(HttpServletRequest request) throws Exception {
+        MyResponse res = new MyResponse();
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null) {
+            return res.setData(false);
+        }
+
+        Boolean validate = jwtUtil.validateToken(header);
+        if (!validate) {
+            return res.setData(false);
+        }
+
+        Claims claims = jwtUtil.parseToken(header);
+        String subject = claims.getSubject();
+        String tokenType = claims.get("tokenType", String.class);
+
+        if (!subject.equals("accessToken") || !tokenType.equals("access")) {
+            return res.setData(false);
+        }
+
+        return res.setData(true);
+    }
+
 }
