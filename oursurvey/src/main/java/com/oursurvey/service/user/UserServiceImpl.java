@@ -2,9 +2,11 @@ package com.oursurvey.service.user;
 
 import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Grade;
+import com.oursurvey.entity.Point;
 import com.oursurvey.entity.User;
 import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.repo.grade.GradeRepo;
+import com.oursurvey.repo.point.PointRepo;
 import com.oursurvey.repo.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepo repo;
     private final GradeRepo gradeRepo;
+    private final PointRepo pointRepo;
 
     @Override
     public Optional<UserDto.Basic> findByEmail(String email) {
@@ -41,6 +44,15 @@ public class UserServiceImpl implements UserService {
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .pwd(dto.getPwd())
+                .build());
+
+        // save point
+        pointRepo.save(Point.builder()
+                .user(save)
+                .value(Point.JOIN_VALUE)
+                .reason(Point.JOIN_REASON)
+                .tablePk(save.getId())
+                .tableName("user")
                 .build());
 
         return save.getId();

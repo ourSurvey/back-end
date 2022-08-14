@@ -11,7 +11,7 @@ type SurveyDto {
     startDate: String!,
     endDate: String!,
     createdDt: String!,
-    hashtagList: String
+    hashtagList: [String]
 }
 
 type Page {

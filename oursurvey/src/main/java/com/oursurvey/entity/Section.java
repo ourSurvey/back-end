@@ -22,17 +22,21 @@ public class Section extends CommonDate {
     @JoinColumn(name = "survey_id", nullable = false)
     private Survey survey;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "content")
+    private String content;
 
     @Column(name = "next_section", nullable = false)
     private Long nextSection=0L;
 
     @Builder
-    public Section(Long id, Survey survey, String title, Long nextSection) {
+    public Section(Long id, Survey survey, String title, String content, Long nextSection) {
         this.id = id;
         this.survey = survey;
         this.title = title;
+        this.content = content;
         this.nextSection = nextSection;
     }
 }

@@ -2,7 +2,7 @@ package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.*;
-import com.oursurvey.entity.Point;
+import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.exception.PointLackException;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.survey.SurveyService;
@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -38,14 +38,27 @@ public class SurveyController {
         MyResponse res = new MyResponse();
 
         Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size));
-        HashMap<String, Object> dataMap = new HashMap<>();
+        lizts.map(SurveyDto.Lizt::convertHashtagListToList);
 
+        HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("totalElements", lizts.getTotalElements());
         dataMap.put("totalPages", lizts.getTotalPages());
         dataMap.put("isLast", lizts.isLast());
         dataMap.put("content", lizts.getContent());
         return res.setData(dataMap);
     }
+
+    @GetMapping("/{id}")
+    public MyResponse get(@PathVariable Long id) {
+        MyResponse res = new MyResponse();
+        Optional<SurveyDto.Detail> opt = surveyService.findById(id);
+        if (opt.isEmpty()) {
+            throw new ObjectNotFoundException("no survey");
+        }
+
+        return res.setData(opt.get());
+    }
+
 
     // NOTE. [point -1000]
     @PostMapping
@@ -63,21 +76,12 @@ public class SurveyController {
         surveyDto.setUserId(id);
 
         // save survey
-        Long surveyId = surveyService.create(surveyDto);
-
-        // save point
-        Integer survey = pointService.create(PointDto.Create.builder()
-                .userId(id)
-                .value(Point.CREATE_SURVEY_VALUE)
-                .reason(Point.CREATE_SURVEY_REASON)
-                .tablePk(surveyId)
-                .tableName("survey")
-                .build());
-
+        surveyService.create(surveyDto);
         return res;
     }
 
     private SurveyDto.Create getSurveyFromJson(JSONObject object) {
+
         return SurveyDto.Create.builder()
                 .subject(object.getString("subject"))
                 .content(object.getString("content"))
@@ -86,8 +90,15 @@ public class SurveyController {
                 .minute(object.getInt("minute"))
                 .openFl(object.getInt("openFl"))
                 .closingComment(object.getString("closingComment"))
+                .hashtagList(getHashtag(object.getJSONArray("hashtag")))
                 .sectionList(getSectionFromJson(object.getJSONArray("sections")))
                 .build();
+    }
+
+    private List<String> getHashtag(JSONArray jsonArray) {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) list.add(jsonArray.getString(i));
+        return list;
     }
 
     private List<SectionDto.Create> getSectionFromJson(JSONArray sectionList) {
@@ -110,7 +121,7 @@ public class SurveyController {
             JSONObject question = questionList.getJSONObject(j);
             questionDtoList.add(QuestionDto.Create.builder()
                     .ask(question.getString("ask"))
-                    .explain(question.getString("explain"))
+                    .descrip(question.getString("descrip"))
                     .multiFl(question.getInt("multiFl"))
                     .essFl(question.getInt("essFl"))
                     .dupFl(question.getInt("dupFl"))

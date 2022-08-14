@@ -22,11 +22,32 @@ public class SurveyDto {
         private Integer minute;
         private Integer openFl;
         private String closingComment;
+        private List<String> hashtagList;
         private List<SectionDto.Create> sectionList;
 
         public void setUserId(Long userId) {
             this.userId = userId;
         }
+    }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class Detail {
+        private String subject;
+        private String content;
+        private Integer openFl;
+        private Integer minute;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate startDate;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate endDate;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDateTime createdDt;
+        private List<String> hashtagList;
+        private List<SectionDto.Detail> sectionList;
     }
 
     @Getter
@@ -44,6 +65,15 @@ public class SurveyDto {
         private LocalDate endDate;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
         private LocalDateTime createdDt;
-        private String hashtagList;
+        private Object hashtagList;
+
+        public Lizt convertHashtagListToList() {
+            String a = (String) hashtagList;
+            if (a != null) {
+                this.hashtagList = List.of(a.split(","));
+            }
+
+            return this;
+        }
     }
 }

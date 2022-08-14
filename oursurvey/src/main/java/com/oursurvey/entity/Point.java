@@ -13,8 +13,11 @@ import javax.persistence.*;
 @DynamicInsert
 @DynamicUpdate
 public class Point extends CommonDate {
-    public final static Integer LOGIN_VALUE = 30;
+    public final static Integer LOGIN_VALUE = 50;
     public final static String LOGIN_REASON = "LOGIN";
+
+    public final static Integer JOIN_VALUE = 1000;
+    public final static String JOIN_REASON = "JOIN";
 
     public final static Integer CREATE_SURVEY_VALUE = -1000;
     public final static String CREATE_SURVEY_REASON = "CREATE_SURVEY";

@@ -1,12 +1,8 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.ManyToAny;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,15 +13,21 @@ import java.io.Serializable;
 @ToString
 @DynamicInsert
 @DynamicUpdate
-@IdClass(HashtagSurvey.class)
+@IdClass(HashtagSurveyIdClass.class)
 public class HashtagSurvey implements Serializable {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "survey_id", nullable = false)
+    @JoinColumn(name = "survey_id", referencedColumnName = "id", nullable = false)
     private Survey survey;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hashtag_id", nullable = false)
+    @JoinColumn(name = "hashtag_id", referencedColumnName = "id", nullable = false)
     private Hashtag hashtag;
+
+    @Builder
+    public HashtagSurvey(Survey survey, Hashtag hashtag) {
+        this.survey = survey;
+        this.hashtag = hashtag;
+    }
 }

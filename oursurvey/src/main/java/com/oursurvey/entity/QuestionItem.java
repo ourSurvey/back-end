@@ -25,13 +25,17 @@ public class QuestionItem extends CommonDate {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "oder", nullable = false)
+    private Integer oder;
+
     @Column(name = "next_section")
     private Long nextSection;
 
     @Builder
-    public QuestionItem(Question question, String content, Long nextSection) {
+    public QuestionItem(Question question, String content, Integer oder, Long nextSection) {
         this.question = question;
         this.content = content;
+        this.oder = oder;
         this.nextSection = nextSection;
     }
 }

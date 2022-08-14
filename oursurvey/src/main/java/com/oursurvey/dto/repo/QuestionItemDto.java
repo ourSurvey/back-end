@@ -13,4 +13,15 @@ public class QuestionItemDto {
         private Integer oder;
         private Long nextSection;
     }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class Detail {
+        private String content;
+        private Integer oder;
+        private Long nextSection;
+    }
 }

@@ -53,7 +53,7 @@ public class AuthController {
     @Value("${spring.mail.prefix.key}")
     private String MAIL_PREFIX_KEY;
 
-    // NOTE. [point +30]
+    // NOTE. [point ++]
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
         MyResponse res = new MyResponse();
@@ -77,6 +77,8 @@ public class AuthController {
         dataMap.put("access", token.getAccessToken());
         dataMap.put("refresh", token.getRefreshToken());
         dataMap.put("refreshExpire", token.getRefreshTokenExpire());
+        dataMap.put("sumPoint", pointService.findSumByUserId(user.getId()));
+        dataMap.put("savedPoint", null);
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
@@ -97,12 +99,13 @@ public class AuthController {
                     .tableName("user")
                     .build());
 
-            dataMap.put("savedPoint", Point.LOGIN_VALUE);
+            dataMap.replace("savedPoint", Point.LOGIN_VALUE);
         }
 
         return res.setData(dataMap);
     }
 
+    // NOTE. [point ++]
     @PostMapping("/join")
     public MyResponse join(@Validated @RequestBody AuthDto.Join dto, BindingResult br) {
         MyResponse res = new MyResponse();
@@ -125,6 +128,7 @@ public class AuthController {
         HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("tokenType", "Bearer");
         dataMap.put("access", token.getAccessToken());
+        dataMap.put("savedPoint", Point.JOIN_VALUE);
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();

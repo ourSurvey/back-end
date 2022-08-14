@@ -16,4 +16,16 @@ public class SectionDto {
         private Long nextSection;
         private List<QuestionDto.Create> questionList;
     }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class Detail {
+        private String title;
+        private String content;
+        private Long nextSection;
+        private List<QuestionDto.Detail> questionList;
+    }
 }

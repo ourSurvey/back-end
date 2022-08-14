@@ -49,7 +49,7 @@ public class Survey extends CommonDate {
         this.id = id;
         this.user = user;
         this.subject = subject;
-        this.content = getContent();
+        this.content = content;
         this.minute = minute;
         this.startDate = startDate;
         this.endDate = endDate;

@@ -25,8 +25,8 @@ public class Question extends CommonDate {
     @Column(name = "ask", nullable = false)
     private String ask;
 
-    @Column(name = "explain")
-    private String explain;
+    @Column(name = "descrip")
+    private String descrip;
 
     @Column(name = "oder", nullable = false)
     private Integer oder;
@@ -41,11 +41,11 @@ public class Question extends CommonDate {
     private Integer essFl;
 
     @Builder
-    public Question(Long id, Section section, String ask, String explain, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
+    public Question(Long id, Section section, String ask, String descrip, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
         this.id = id;
         this.section = section;
         this.ask = ask;
-        this.explain = explain;
+        this.descrip = descrip;
         this.oder = oder;
         this.multiFl = multiFl;
         this.duplFl = duplFl;

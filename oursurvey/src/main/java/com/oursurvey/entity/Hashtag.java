@@ -1,9 +1,6 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -23,4 +20,10 @@ public class Hashtag {
 
     @Column(name = "value", unique = true, nullable = false)
     private String value;
+
+    @Builder
+    public Hashtag(Long id, String value) {
+        this.id = id;
+        this.value = value;
+    }
 }

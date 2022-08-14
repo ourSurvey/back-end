@@ -4,6 +4,7 @@ import com.oursurvey.dto.repo.SurveyDto;
 import com.oursurvey.entity.QHashtag;
 import com.oursurvey.entity.QHashtagSurvey;
 import com.oursurvey.entity.QSurvey;
+import com.oursurvey.entity.Survey;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.oursurvey.entity.QHashtag.hashtag;
 import static com.oursurvey.entity.QHashtagSurvey.hashtagSurvey;
@@ -25,6 +27,11 @@ import static com.oursurvey.entity.QSurvey.survey;
 @RequiredArgsConstructor
 public class SurveyRepoImpl implements SurveyRepoCustom {
     private final JPAQueryFactory factory;
+
+    @Override
+    public Optional<Survey> getFromId(Long id) {
+        return Optional.ofNullable(factory.selectFrom(survey).where(survey.id.eq(id)).fetchOne());
+    }
 
     @Override
     public Page<SurveyDto.Lizt> get(Pageable pageable) {

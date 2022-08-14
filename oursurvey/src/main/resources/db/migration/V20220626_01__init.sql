@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `question` (
     `multi_fl` tinyint NOT NULL,
     `dupl_fl` tinyint NOT NULL,
     `ess_fl` tinyint NOT NULL,
-    `explain` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
+    `descrip` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
