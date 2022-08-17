@@ -44,6 +44,7 @@ public class SurveyController {
         dataMap.put("totalElements", lizts.getTotalElements());
         dataMap.put("totalPages", lizts.getTotalPages());
         dataMap.put("isLast", lizts.isLast());
+        dataMap.put("currentPage", page);
         dataMap.put("content", lizts.getContent());
         return res.setData(dataMap);
     }

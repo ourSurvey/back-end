@@ -1,10 +1,7 @@
 package com.oursurvey.repo.survey;
 
 import com.oursurvey.dto.repo.SurveyDto;
-import com.oursurvey.entity.QHashtag;
-import com.oursurvey.entity.QHashtagSurvey;
-import com.oursurvey.entity.QSurvey;
-import com.oursurvey.entity.Survey;
+import com.oursurvey.entity.*;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -22,15 +19,20 @@ import java.util.Optional;
 import static com.oursurvey.entity.QHashtag.hashtag;
 import static com.oursurvey.entity.QHashtagSurvey.hashtagSurvey;
 import static com.oursurvey.entity.QSurvey.survey;
+import static com.oursurvey.entity.QUser.user;
 
 @Slf4j
 @RequiredArgsConstructor
 public class SurveyRepoImpl implements SurveyRepoCustom {
     private final JPAQueryFactory factory;
 
+    private JPAQuery<Survey> getBaseJoin() {
+        return factory.selectFrom(survey).join(survey.user, user).fetchJoin();
+    }
+
     @Override
     public Optional<Survey> getFromId(Long id) {
-        return Optional.ofNullable(factory.selectFrom(survey).where(survey.id.eq(id)).fetchOne());
+        return Optional.ofNullable(getBaseJoin().where(survey.id.eq(id)).fetchOne());
     }
 
     @Override
@@ -38,6 +40,7 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
         JPAQuery<SurveyDto.Lizt> query = factory.select(
                         Projections.constructor(
                                 SurveyDto.Lizt.class,
+                                survey.id,
                                 survey.subject,
                                 survey.content,
                                 survey.openFl,

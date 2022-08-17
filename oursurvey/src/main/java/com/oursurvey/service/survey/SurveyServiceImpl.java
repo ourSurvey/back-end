@@ -75,6 +75,7 @@ public class SurveyServiceImpl implements SurveyService {
         }).toList();
 
         return Optional.of(SurveyDto.Detail.builder()
+                .nickname(survey.getUser().getNickname())
                 .subject(survey.getSubject())
                 .content(survey.getContent())
                 .openFl(survey.getOpenFl())
