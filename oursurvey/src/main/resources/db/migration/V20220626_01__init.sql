@@ -194,15 +194,12 @@ CREATE TABLE IF NOT EXISTS `answer` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `reply_id` bigint NOT NULL,
     `question_id` bigint NOT NULL,
-    `question_item_id` bigint NULL,
-    `response` varchar(255) COLLATE utf8mb4_general_ci DEFAULT '',
+    `response` varchar(255) COLLATE utf8mb4_general_ci,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `FK_answer_reply` (`reply_id`),
     KEY `FK_answer_question` (`question_id`),
-    KEY `FK_answer_question_item` (`question_item_id`),
     CONSTRAINT `FK_answer_question` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT `FK_answer_question_item` FOREIGN KEY (`question_item_id`) REFERENCES `question_item` (`id`) ON DELETE RESTRICT,
     CONSTRAINT `FK_answer_reply` FOREIGN KEY (`reply_id`) REFERENCES `reply` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

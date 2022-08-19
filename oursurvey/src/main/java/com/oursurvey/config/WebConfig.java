@@ -55,6 +55,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/auth/resetpwd",  // 비밀번호 초기화
                         "/api/auth/refresh",   // access 토큰 재발급
                         "/api/auth/validate",  // access 토큰 검증
+                        "/api/reply",          // 설문 답변
                         "/graphql",
                         "/graphiql"
                 );

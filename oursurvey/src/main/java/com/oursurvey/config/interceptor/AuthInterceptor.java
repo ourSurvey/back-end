@@ -45,7 +45,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             "GET:/api/survey"
     );
 
-    private List<String> permit = List.of("active", "auth", "point", "survey");
+    private List<String> permit = List.of("active", "auth", "point", "survey", "hashtag", "reply");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -1,9 +1,6 @@
 package com.oursurvey.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -12,7 +9,7 @@ import javax.persistence.*;
 @Entity(name = "answer")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString(exclude = {"reply", "question", "questionItem"})
+@ToString(exclude = {"reply", "question"})
 @DynamicInsert
 @DynamicUpdate
 public class Answer extends CommonDate {
@@ -29,10 +26,14 @@ public class Answer extends CommonDate {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_item_id")
-    private QuestionItem questionItem;
-
     @Column(name = "response")
     private String response;
+
+    @Builder
+    public Answer(Long id, Reply reply, Question question, String response) {
+        this.id = id;
+        this.reply = reply;
+        this.question = question;
+        this.response = response;
+    }
 }

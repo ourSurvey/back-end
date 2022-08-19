@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.oursurvey.entity.QQuestion.question;
 import static com.oursurvey.entity.QSection.section;
@@ -26,5 +27,10 @@ public class QuestionRepoImpl implements QuestionRepoCustom {
     @Override
     public List<Question> getBySectionId(Long id) {
         return getBaseJoin().where(question.section.id.eq(id)).fetch();
+    }
+
+    @Override
+    public Optional<Question> getFromId(Long id) {
+        return Optional.ofNullable(getBaseJoin().where(question.id.eq(id)).fetchOne());
     }
 }
