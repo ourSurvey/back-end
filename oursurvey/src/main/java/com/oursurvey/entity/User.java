@@ -62,6 +62,11 @@ public class User extends CommonDate {
         }
     }
 
+    // 레벨업
+    public void promoteGrade(Grade grade) {
+        this.grade = grade;
+    }
+
     // 부가정보변경
     public void updateAddition(String gender, Integer age, String tel) {
         if (StringUtils.hasText(gender)) {

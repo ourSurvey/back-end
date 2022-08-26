@@ -2,6 +2,9 @@ package com.oursurvey.service.survey;
 
 import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.*;
+import com.oursurvey.exception.AuthFailException;
+import com.oursurvey.exception.ObjectNotFoundException;
+import com.oursurvey.repo.experience.ExperienceRepo;
 import com.oursurvey.repo.hashtag.HashtagRepo;
 import com.oursurvey.repo.hashtagsurvey.HashtagSurveyRepo;
 import com.oursurvey.repo.point.PointRepo;
@@ -9,6 +12,7 @@ import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.questionitem.QuestionItemRepo;
 import com.oursurvey.repo.section.SectionRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
+import com.oursurvey.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +34,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final QuestionRepo questionRepo;
     private final QuestionItemRepo questionItemRepo;
     private final PointRepo pointRepo;
+    private final ExperienceRepo experienceRepo;
     private final HashtagRepo hashtagRepo;
     private final HashtagSurveyRepo hashtagSurveyRepo;
 
@@ -91,6 +96,21 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long create(SurveyDto.Create dto) {
+        // 임시 -> 실제 전환시 예외처리(기존꺼 삭제)
+        if (dto.getId() != null && dto.getId() > 0 && dto.getTempFl().equals(0)) {
+            Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
+            if (surveyOpt.isEmpty()) {
+                throw new ObjectNotFoundException("no survey");
+            }
+
+            Survey survey = surveyOpt.get();
+            if (!dto.getUserId().equals(survey.getUser().getId())) {
+                throw new AuthFailException("it`s not your survey");
+            }
+
+            repo.deleteById(dto.getId());
+        }
+
         Survey saveSurvey = repo.save(Survey.builder()
                 .user(User.builder().id(dto.getUserId()).build())
                 .subject(dto.getSubject())
@@ -99,6 +119,7 @@ public class SurveyServiceImpl implements SurveyService {
                 .startDate(LocalDate.parse(dto.getStartDate()))
                 .endDate(LocalDate.parse(dto.getEndDate()))
                 .openFl(dto.getOpenFl())
+                .tempFl(dto.getTempFl())
                 .closingComment(dto.getClosingComment())
                 .build());
 
@@ -151,14 +172,25 @@ public class SurveyServiceImpl implements SurveyService {
             });
         });
 
-        // save point
-        pointRepo.save(Point.builder()
-                .user(User.builder().id(dto.getUserId()).build())
-                .value(Point.CREATE_SURVEY_VALUE)
-                .reason(Point.CREATE_SURVEY_REASON)
-                .tablePk(saveSurvey.getId())
-                .tableName("survey")
-                .build());
+        if (dto.getTempFl().equals(0)) {
+            // save point
+            pointRepo.save(Point.builder()
+                    .user(User.builder().id(dto.getUserId()).build())
+                    .value(Point.CREATE_SURVEY_VALUE)
+                    .reason(Point.CREATE_SURVEY_REASON)
+                    .tablePk(saveSurvey.getId())
+                    .tableName("survey")
+                    .build());
+
+            // save experience
+            experienceRepo.save(Experience.builder()
+                    .user(User.builder().id(dto.getUserId()).build())
+                    .value(Experience.CREATE_SURVEY_VALUE)
+                    .reason(Experience.CREATE_SURVEY_REASON)
+                    .tablePk(saveSurvey.getId())
+                    .tableName("survey")
+                    .build());
+        }
 
         return saveSurvey.getId();
     }

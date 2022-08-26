@@ -24,4 +24,9 @@ public class UserRepoImpl implements UserRepoCustom {
     public Optional<User> getByEmail(String email) {
         return Optional.ofNullable(getBaseJoin().where(user.email.eq(email)).fetchOne());
     }
+
+    @Override
+    public Optional<User> getFromId(Long id) {
+        return Optional.ofNullable(getBaseJoin().where(user.id.eq(id)).fetchOne());
+    }
 }

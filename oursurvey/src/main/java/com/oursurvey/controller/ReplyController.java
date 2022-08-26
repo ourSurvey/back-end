@@ -35,6 +35,7 @@ public class ReplyController {
     private final PointService pointService;
     private final JwtUtil jwtUtil;
 
+    // NOTE. [point ++, experience ++]
     @PostMapping
     public MyResponse post(HttpServletRequest request, @RequestBody String json) {
         MyResponse res = new MyResponse();
@@ -49,24 +50,11 @@ public class ReplyController {
         dto.setUserId(loginUserId);
 
         // save reply
-        Long reply = service.create(dto);
+        service.create(dto);
 
-        Map<String, Object> dataMap = new HashMap<>();
-
-        // save point
-        if (loginUserId != null) {
-            pointService.create(PointDto.Create.builder()
-                    .userId(loginUserId)
-                    .value(Point.REPLY_SURVEY_VALUE)
-                    .reason(Point.REPLY_SURVEY_REASON)
-                    .tablePk(reply)
-                    .tableName("reply")
-                    .build());
-
-            dataMap.put("savedPoint", Point.REPLY_SURVEY_VALUE);
-        }
-
-        return res.setData(dataMap);
+        HashMap<String, Integer> map = new HashMap<>();
+        map.put("savedPoint", loginUserId != null ? Point.REPLY_SURVEY_VALUE : 0);
+        return res.setData(map);
     }
 
     private ReplyDto.Create getReplyFromJson(JSONObject j) {

@@ -2,6 +2,7 @@ package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.*;
+import com.oursurvey.entity.Point;
 import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.exception.PointLackException;
 import com.oursurvey.service.point.PointService;
@@ -61,14 +62,14 @@ public class SurveyController {
     }
 
 
-    // NOTE. [point -1000]
+    // NOTE. [point ++, experience ++]
     @PostMapping
     public MyResponse create(HttpServletRequest request, @RequestBody String json) {
         MyResponse res = new MyResponse();
 
         Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
         Integer sumPoint = pointService.findSumByUserId(id);
-        if (sumPoint < 1000) {
+        if (sumPoint < -(Point.CREATE_SURVEY_VALUE)) {
             throw new PointLackException("lack point");
         }
 
@@ -82,14 +83,15 @@ public class SurveyController {
     }
 
     private SurveyDto.Create getSurveyFromJson(JSONObject object) {
-
         return SurveyDto.Create.builder()
+                .id(object.getLong("id"))
                 .subject(object.getString("subject"))
                 .content(object.getString("content"))
                 .startDate(object.getString("startDate"))
                 .endDate(object.getString("endDate"))
                 .minute(object.getInt("minute"))
                 .openFl(object.getInt("openFl"))
+                .tempFl(object.getInt("tempFl"))
                 .closingComment(object.getString("closingComment"))
                 .hashtagList(getHashtag(object.getJSONArray("hashtag")))
                 .sectionList(getSectionFromJson(object.getJSONArray("sections")))

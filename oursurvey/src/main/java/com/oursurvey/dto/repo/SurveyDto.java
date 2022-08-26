@@ -14,6 +14,7 @@ public class SurveyDto {
     @AllArgsConstructor
     @Builder
     public static class Create {
+        private Long id;
         private Long userId;
         private String subject;
         private String content;
@@ -21,10 +22,10 @@ public class SurveyDto {
         private String endDate;
         private Integer minute;
         private Integer openFl;
+        private Integer tempFl;
         private String closingComment;
         private List<String> hashtagList;
         private List<SectionDto.Create> sectionList;
-
         public void setUserId(Long userId) {
             this.userId = userId;
         }

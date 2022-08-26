@@ -6,6 +6,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import static com.oursurvey.entity.QGrade.grade;
 
 @Slf4j
@@ -16,5 +18,10 @@ public class GradeRepoImpl implements GradeRepoCustom {
     @Override
     public Grade getFirstGrade() {
         return factory.selectFrom(grade).orderBy(grade.pivot.asc()).limit(1).fetchOne();
+    }
+
+    @Override
+    public List<Grade> getDesc() {
+        return factory.selectFrom(grade).orderBy(grade.pivot.desc()).fetch();
     }
 }

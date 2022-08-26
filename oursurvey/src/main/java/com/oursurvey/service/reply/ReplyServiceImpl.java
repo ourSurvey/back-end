@@ -3,11 +3,15 @@ package com.oursurvey.service.reply;
 import com.oursurvey.dto.repo.AnswerDto;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.*;
+import com.oursurvey.exception.AlreadyReplySurveyException;
 import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.repo.answer.AnswerRepo;
+import com.oursurvey.repo.experience.ExperienceRepo;
+import com.oursurvey.repo.point.PointRepo;
 import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.reply.ReplyRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
+import com.oursurvey.repo.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,8 @@ public class ReplyServiceImpl implements ReplyService {
     private final AnswerRepo answerRepo;
     private final SurveyRepo surveyRepo;
     private final QuestionRepo questionRepo;
+    private final PointRepo pointRepo;
+    private final ExperienceRepo experienceRepo;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -33,6 +39,14 @@ public class ReplyServiceImpl implements ReplyService {
         Optional<Survey> surveyOpt = surveyRepo.getFromId(dto.getSurveyId());
         if (surveyOpt.isEmpty()) {
             throw new ObjectNotFoundException("no survey");
+        }
+
+        // 중복 참여 불가
+        if (dto.getUserId() != null) {
+            Optional<Reply> optReply = repo.getBySurveyIdUserId(dto.getSurveyId(), dto.getUserId());
+            if (optReply.isPresent()) {
+                throw new AlreadyReplySurveyException("already reply survey");
+            }
         }
 
         // NOTE. 절대 User.builder().id(null).build() 하면 안됨 -> null로 객체를 넣으면 안됨
@@ -59,6 +73,25 @@ public class ReplyServiceImpl implements ReplyService {
                 .response(StringUtils.hasText(e.getValue()) ? e.getValue() : null)
                 .build());
         });
+
+        // save point & experience
+        if (dto.getUserId() != null) {
+            pointRepo.save(Point.builder()
+                    .user(User.builder().id(dto.getUserId()).build())
+                    .value(Point.REPLY_SURVEY_VALUE)
+                    .reason(Point.REPLY_SURVEY_REASON)
+                    .tablePk(saveReply.getId())
+                    .tableName("reply")
+                    .build());
+
+            experienceRepo.save(Experience.builder()
+                    .user(User.builder().id(dto.getUserId()).build())
+                    .value(Experience.REPLY_SURVEY_VALUE)
+                    .reason(Experience.REPLY_SURVEY_REASON)
+                    .tablePk(saveReply.getId())
+                    .tableName("reply")
+                    .build());
+        }
 
         return saveReply.getId();
     }

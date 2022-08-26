@@ -3,11 +3,14 @@ package com.oursurvey.controller;
 import com.oursurvey.dto.AuthDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.TokenDto;
+import com.oursurvey.dto.repo.ExperienceDto;
 import com.oursurvey.dto.repo.LoggedInDto;
 import com.oursurvey.dto.repo.PointDto;
 import com.oursurvey.dto.repo.UserDto;
+import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Point;
 import com.oursurvey.exception.*;
+import com.oursurvey.service.TransactionService;
 import com.oursurvey.service.loggedin.LoggedInService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.user.UserService;
@@ -26,8 +29,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.DateFormatter;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ public class AuthController {
     private final UserService service;
     private final PointService pointService;
     private final LoggedInService logService;
+    private final TransactionService tService;
 
     private final PasswordEncoder encoder;
     private final RedisTemplate<String, Object> redis;
@@ -53,7 +55,7 @@ public class AuthController {
     @Value("${spring.mail.prefix.key}")
     private String MAIL_PREFIX_KEY;
 
-    // NOTE. [point ++]
+    // NOTE. [point ++, experience ++]
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
         MyResponse res = new MyResponse();
@@ -84,17 +86,22 @@ public class AuthController {
         ValueOperations<String, Object> vop = redis.opsForValue();
         vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
 
-        // log & point
+        // log & point & experience
         Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         if (logOpt.isEmpty()) {
-            // save log
-            logService.create(LoggedInDto.Create.builder().userId(user.getId()).remoteAddr(request.getRemoteAddr()).build());
-
-            // save point
-            pointService.create(PointDto.Create.builder()
+            tService.saveLogAndPointAndExperience(
+                    LoggedInDto.Create.builder().userId(user.getId()).remoteAddr(request.getRemoteAddr()).build(),
+                    PointDto.Create.builder()
                     .userId(user.getId())
                     .value(Point.LOGIN_VALUE)
                     .reason(Point.LOGIN_REASON)
+                    .tablePk(user.getId())
+                    .tableName("user")
+                    .build(),
+                    ExperienceDto.Create.builder()
+                    .userId(user.getId())
+                    .value(Experience.LOGIN_VALUE)
+                    .reason(Experience.LOGIN_REASON)
                     .tablePk(user.getId())
                     .tableName("user")
                     .build());
