@@ -3,6 +3,7 @@ package com.oursurvey;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class RandomTest {
     @Test
@@ -14,5 +15,9 @@ public class RandomTest {
         }
 
         System.out.println("code = " + code);
+    }
+
+    @Test
+    void test2() {
     }
 }

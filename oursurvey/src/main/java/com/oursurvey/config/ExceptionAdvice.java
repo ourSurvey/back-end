@@ -24,6 +24,7 @@ public class ExceptionAdvice {
             InvalidAccessTokenException.class,
             InvalidRefreshTokenException.class,
             CertifiedException.class,
+            S3FileUploadException.class,
             RuntimeException.class
     })
     public MyResponse exceptionFor400(Exception e) {
@@ -34,6 +35,7 @@ public class ExceptionAdvice {
         if (e instanceof InvalidAccessTokenException) myResponse.setCode(MyResponse.INVALID_ACCESSTOKEN);
         if (e instanceof InvalidRefreshTokenException) myResponse.setCode(MyResponse.INVALID_REFRESHTOKEN);
         if (e instanceof CertifiedException) myResponse.setCode(MyResponse.INVALID_CERTIFIED_CODE);
+        if (e instanceof S3FileUploadException) myResponse.setCode(MyResponse.S3_FILE_UPLOAD);
         return myResponse;
     }
 

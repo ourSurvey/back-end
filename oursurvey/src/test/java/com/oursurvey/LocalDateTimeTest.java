@@ -3,6 +3,7 @@ package com.oursurvey;
 import io.netty.handler.codec.DateFormatter;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -22,5 +23,13 @@ public class LocalDateTimeTest {
 
         String mm = now.format(DateTimeFormatter.ofPattern("MM"));
         System.out.println("mm = " + mm);
+    }
+
+    @Test
+    void test2() {
+        LocalDate now = LocalDate.now();
+        String mm = now.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        System.out.println("mm = " + mm);
+
     }
 }

@@ -15,16 +15,19 @@ DROP TABLE IF EXISTS `user`;
 DROP TABLE IF EXISTS `grade`;
 
 CREATE TABLE IF NOT EXISTS `file` (
-    `id` int NOT NULL AUTO_INCREMENT,
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT(19) NOT NULL,
     `table_pk` bigint NOT NULL,
-    `table_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-    `origin_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+    `table_name` varchar(255) COLLATE utf8mb4_general_ci default NULL,
+    `origin_name` varchar(255) COLLATE utf8mb4_general_ci default NULL,
+    `dir` VARCHAR(255) NULL DEFAULT NULL,
     `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
     `path` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
     `ext` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    CONSTRAINT `FK_file_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `grade` (
