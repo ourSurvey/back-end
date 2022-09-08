@@ -26,6 +26,7 @@ public class QuestionDto {
     @AllArgsConstructor
     @Builder
     public static class Detail {
+        private Long id;
         private String ask;
         private String descrip;
         private Integer multiFl;

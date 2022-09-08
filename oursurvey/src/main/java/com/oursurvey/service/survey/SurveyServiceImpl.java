@@ -55,12 +55,14 @@ public class SurveyServiceImpl implements SurveyService {
 
                 List<QuestionItemDto.Detail> questionItemDetailDtoList = questionItemList.stream().map(questionItem ->
                         QuestionItemDto.Detail.builder()
+                                .id(questionItem.getId())
                                 .content(questionItem.getContent())
                                 .oder(questionItem.getOder())
                                 .nextSection(questionItem.getNextSection())
                                 .build()).toList();
 
                 return QuestionDto.Detail.builder()
+                        .id(question.getId())
                         .ask(question.getAsk())
                         .descrip(question.getDescrip())
                         .multiFl(question.getMultiFl())
@@ -72,6 +74,7 @@ public class SurveyServiceImpl implements SurveyService {
             }).toList();
 
             return SectionDto.Detail.builder()
+                    .id(section.getId())
                     .title(section.getTitle())
                     .content(section.getContent())
                     .nextSection(section.getNextSection())
@@ -80,6 +83,7 @@ public class SurveyServiceImpl implements SurveyService {
         }).toList();
 
         return Optional.of(SurveyDto.Detail.builder()
+                .id(survey.getId())
                 .nickname(survey.getUser().getNickname())
                 .subject(survey.getSubject())
                 .content(survey.getContent())

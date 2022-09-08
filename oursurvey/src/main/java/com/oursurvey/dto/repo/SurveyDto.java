@@ -37,6 +37,7 @@ public class SurveyDto {
     @AllArgsConstructor
     @Builder
     public static class Detail {
+        private Long id;
         private String nickname;
         private String subject;
         private String content;
