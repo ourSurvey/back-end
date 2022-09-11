@@ -5,5 +5,5 @@ import com.oursurvey.entity.Reply;
 import java.util.Optional;
 
 public interface ReplyRepoCustom {
-    Optional<Reply> getBySurveyIdUserId(Long surveyId, Long userId);
+    Optional<Reply> getBySurveyIdUserId(String surveyId, Long userId);
 }

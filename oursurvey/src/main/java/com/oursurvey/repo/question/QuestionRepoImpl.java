@@ -25,12 +25,12 @@ public class QuestionRepoImpl implements QuestionRepoCustom {
     }
 
     @Override
-    public List<Question> getBySectionId(Long id) {
+    public List<Question> getBySectionId(String id) {
         return getBaseJoin().where(question.section.id.eq(id)).fetch();
     }
 
     @Override
-    public Optional<Question> getFromId(Long id) {
+    public Optional<Question> getFromId(String id) {
         return Optional.ofNullable(getBaseJoin().where(question.id.eq(id)).fetchOne());
     }
 }

@@ -47,13 +47,13 @@ public class Experience extends CommonDate {
     private String reason;
 
     @Column(name = "table_pk")
-    private Long tablePk=0L;
+    private String tablePk;
 
     @Column(name = "table_name")
-    private String tableName="";
+    private String tableName;
 
     @Builder
-    public Experience(Long id, User user, Integer value, String reason, Long tablePk, String tableName) {
+    public Experience(Long id, User user, Integer value, String reason, String tablePk, String tableName) {
         this.id = id;
         this.user = user;
         this.value = value;

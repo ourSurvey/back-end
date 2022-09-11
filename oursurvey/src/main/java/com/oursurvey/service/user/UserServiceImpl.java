@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
                 .user(save)
                 .value(Point.JOIN_VALUE)
                 .reason(Point.JOIN_REASON)
-                .tablePk(save.getId())
+                .tablePk(String.valueOf(save.getId()))
                 .tableName("user")
                 .build());
 

@@ -14,7 +14,7 @@ public class SurveyDto {
     @AllArgsConstructor
     @Builder
     public static class Create {
-        private Long id;
+        private String id;
         private Long userId;
         private String subject;
         private String content;
@@ -37,7 +37,7 @@ public class SurveyDto {
     @AllArgsConstructor
     @Builder
     public static class Detail {
-        private Long id;
+        private String id;
         private String nickname;
         private String subject;
         private String content;
@@ -58,7 +58,7 @@ public class SurveyDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class Lizt {
-        private Long id;
+        private String id;
         private String subject;
         private String content;
         private Integer openFl;

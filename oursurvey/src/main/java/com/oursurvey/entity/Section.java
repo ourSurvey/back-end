@@ -13,10 +13,11 @@ import javax.persistence.*;
 @DynamicInsert
 @DynamicUpdate
 public class Section extends CommonDate {
+    public final static String NAME = "section";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id", nullable = false)
@@ -32,7 +33,7 @@ public class Section extends CommonDate {
     private Long nextSection=0L;
 
     @Builder
-    public Section(Long id, Survey survey, String title, String content, Long nextSection) {
+    public Section(String id, Survey survey, String title, String content, Long nextSection) {
         this.id = id;
         this.survey = survey;
         this.title = title;

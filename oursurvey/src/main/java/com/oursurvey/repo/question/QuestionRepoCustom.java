@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepoCustom {
-    List<Question> getBySectionId(Long id);
+    List<Question> getBySectionId(String id);
 
-    Optional<Question> getFromId(Long id);
+    Optional<Question> getFromId(String id);
 }

@@ -5,5 +5,5 @@ import com.oursurvey.entity.QuestionItem;
 import java.util.List;
 
 public interface QuestionItemRepoCustom {
-    List<QuestionItem> getByQuestionId(Long id);
+    List<QuestionItem> getByQuestionId(String id);
 }

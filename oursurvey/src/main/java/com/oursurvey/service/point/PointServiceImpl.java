@@ -23,7 +23,7 @@ public class PointServiceImpl implements PointService {
                 .user(User.builder().id(dto.getUserId()).build())
                 .value(dto.getValue())
                 .reason(dto.getReason())
-                .tablePk(dto.getTablePk())
+                .tablePk(String.valueOf(dto.getTablePk()))
                 .tableName(dto.getTableName())
                 .build());
 

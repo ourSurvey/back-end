@@ -27,16 +27,4 @@ class SurveyServiceImplTest {
         List<SurveyDto.Lizt> content = list.getContent();
         System.out.println("content = " + content);
     }
-
-    @Test
-    void test2() {
-        Optional<SurveyDto.Detail> opt = service.findById(12L);
-        System.out.println("opt = " + opt);
-    }
-
-    @Test
-    void test3() {
-        List<HashtagDto.Base> bySurveyId = repo.getBySurveyId(12L);
-        System.out.println("bySurveyId = " + bySurveyId);
-    }
 }

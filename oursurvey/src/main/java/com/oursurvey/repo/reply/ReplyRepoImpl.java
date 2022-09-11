@@ -17,7 +17,7 @@ public class ReplyRepoImpl implements ReplyRepoCustom {
     private final JPAQueryFactory factory;
 
     @Override
-    public Optional<Reply> getBySurveyIdUserId(Long surveyId, Long userId) {
+    public Optional<Reply> getBySurveyIdUserId(String surveyId, Long userId) {
         return Optional.ofNullable(factory.selectFrom(reply)
                 .where(reply.survey.id.eq(surveyId))
                 .where(userId != null ? (reply.user.id.eq(userId)) : (reply.user.isNull()))

@@ -21,7 +21,7 @@ public class HashtagSurveyRepoImpl implements HashtagSurveyRepoCustom {
     private final JPAQueryFactory factory;
 
     @Override
-    public List<HashtagDto.Base> getBySurveyId(Long id) {
+    public List<HashtagDto.Base> getBySurveyId(String id) {
         return factory.select(
                         Projections.constructor(
                                 HashtagDto.Base.class,

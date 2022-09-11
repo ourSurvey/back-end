@@ -80,7 +80,7 @@ public class ReplyServiceImpl implements ReplyService {
                     .user(User.builder().id(dto.getUserId()).build())
                     .value(Point.REPLY_SURVEY_VALUE)
                     .reason(Point.REPLY_SURVEY_REASON)
-                    .tablePk(saveReply.getId())
+                    .tablePk(String.valueOf(saveReply.getId()))
                     .tableName("reply")
                     .build());
 
@@ -88,7 +88,7 @@ public class ReplyServiceImpl implements ReplyService {
                     .user(User.builder().id(dto.getUserId()).build())
                     .value(Experience.REPLY_SURVEY_VALUE)
                     .reason(Experience.REPLY_SURVEY_REASON)
-                    .tablePk(saveReply.getId())
+                    .tablePk(String.valueOf(saveReply.getId()))
                     .tableName("reply")
                     .build());
         }

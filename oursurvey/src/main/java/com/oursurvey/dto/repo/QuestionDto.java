@@ -16,6 +16,7 @@ public class QuestionDto {
         private Integer multiFl;
         private Integer essFl;
         private Integer dupFl;
+        private Integer randomShowFl;
         private Integer oder;
         private List<QuestionItemDto.Create> questionItemList;
     }
@@ -26,7 +27,7 @@ public class QuestionDto {
     @AllArgsConstructor
     @Builder
     public static class Detail {
-        private Long id;
+        private String id;
         private String ask;
         private String descrip;
         private Integer multiFl;

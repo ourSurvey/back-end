@@ -6,5 +6,5 @@ import com.oursurvey.entity.HashtagSurvey;
 import java.util.List;
 
 public interface HashtagSurveyRepoCustom {
-    List<HashtagDto.Base> getBySurveyId(Long id);
+    List<HashtagDto.Base> getBySurveyId(String id);
 }

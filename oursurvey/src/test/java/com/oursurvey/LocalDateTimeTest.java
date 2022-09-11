@@ -23,6 +23,9 @@ public class LocalDateTimeTest {
 
         String mm = now.format(DateTimeFormatter.ofPattern("MM"));
         System.out.println("mm = " + mm);
+
+        String yyyyyy = now.format(DateTimeFormatter.ofPattern("yy"));
+        System.out.println("yyyyyy = " + yyyyyy);
     }
 
     @Test

@@ -9,7 +9,7 @@ public class AnswerDto {
     @AllArgsConstructor
     @Builder
     public static class Create {
-        private Long questionId;
+        private String questionId;
         private String value;
     }
 }

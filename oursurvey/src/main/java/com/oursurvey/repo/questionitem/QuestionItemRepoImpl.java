@@ -23,7 +23,7 @@ public class QuestionItemRepoImpl implements QuestionItemRepoCustom {
     }
 
     @Override
-    public List<QuestionItem> getByQuestionId(Long id) {
+    public List<QuestionItem> getByQuestionId(String id) {
         return getBaseJoin().where(questionItem.question.id.eq(id)).fetch();
     }
 }

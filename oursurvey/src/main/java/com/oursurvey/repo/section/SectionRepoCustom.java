@@ -5,5 +5,5 @@ import com.oursurvey.entity.Section;
 import java.util.List;
 
 public interface SectionRepoCustom {
-    List<Section> getBySurveyId(Long id);
+    List<Section> getBySurveyId(String id);
 }

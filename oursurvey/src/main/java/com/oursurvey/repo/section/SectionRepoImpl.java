@@ -21,8 +21,9 @@ public class SectionRepoImpl implements SectionRepoCustom {
     private JPAQuery<Section> getBaseJoin() {
         return factory.selectFrom(section).join(section.survey, survey).fetchJoin();
     }
+
     @Override
-    public List<Section> getBySurveyId(Long id) {
+    public List<Section> getBySurveyId(String id) {
         return getBaseJoin().where(section.survey.id.eq(id)).fetch();
     }
 }

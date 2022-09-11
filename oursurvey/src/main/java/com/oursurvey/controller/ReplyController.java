@@ -60,7 +60,7 @@ public class ReplyController {
     private ReplyDto.Create getReplyFromJson(JSONObject j) {
         return ReplyDto.Create.builder()
                 .userId(1L)
-                .surveyId(j.getLong("surveyId"))
+                .surveyId(j.getString("surveyId"))
                 .answerList(getAnswerFromJson(j.getJSONArray("answers")))
                 .build();
     }
@@ -70,7 +70,7 @@ public class ReplyController {
         for (int i = 0; i < j.length(); i++) {
             JSONObject obj = j.getJSONObject(i);
             result.add(AnswerDto.Create.builder()
-                    .questionId(obj.getLong("questionId"))
+                    .questionId(obj.getString("questionId"))
                     .value(obj.getString("value"))
                     .build());
         }

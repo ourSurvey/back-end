@@ -13,10 +13,11 @@ import javax.persistence.*;
 @DynamicInsert
 @DynamicUpdate
 public class Question extends CommonDate {
+    public final static String NAME = "question";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id", nullable = false)
@@ -40,8 +41,11 @@ public class Question extends CommonDate {
     @Column(name = "ess_fl", columnDefinition = "TINYINT(3)", nullable = false)
     private Integer essFl;
 
+    @Column(name = "random_show_fl", columnDefinition = "TINYINT(3)", nullable = false)
+    private Integer randomShowFl;
+
     @Builder
-    public Question(Long id, Section section, String ask, String descrip, Integer oder, Integer multiFl, Integer duplFl, Integer essFl) {
+    public Question(String id, Section section, String ask, String descrip, Integer oder, Integer multiFl, Integer duplFl, Integer essFl, Integer randomShowFl) {
         this.id = id;
         this.section = section;
         this.ask = ask;
@@ -50,5 +54,6 @@ public class Question extends CommonDate {
         this.multiFl = multiFl;
         this.duplFl = duplFl;
         this.essFl = essFl;
+        this.randomShowFl = randomShowFl;
     }
 }

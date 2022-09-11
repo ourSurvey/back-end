@@ -1,5 +1,6 @@
 package com.oursurvey.service.survey;
 
+import com.amazonaws.transform.SimpleTypeUnmarshallers;
 import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.*;
 import com.oursurvey.exception.AuthFailException;
@@ -13,12 +14,14 @@ import com.oursurvey.repo.questionitem.QuestionItemRepo;
 import com.oursurvey.repo.section.SectionRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
 import com.oursurvey.service.TransactionService;
+import com.oursurvey.service.pkmanager.PkManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,9 +40,10 @@ public class SurveyServiceImpl implements SurveyService {
     private final ExperienceRepo experienceRepo;
     private final HashtagRepo hashtagRepo;
     private final HashtagSurveyRepo hashtagSurveyRepo;
+    private final PkManagerService pkManager;
 
     @Override
-    public Optional<SurveyDto.Detail> findById(Long id) {
+    public Optional<SurveyDto.Detail> findById(String id) {
         Optional<Survey> opt = repo.getFromId(id);
         if (opt.isEmpty()) {
             return Optional.empty();
@@ -99,9 +103,9 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long create(SurveyDto.Create dto) {
+    public String create(SurveyDto.Create dto) {
         // 임시 -> 실제 전환시 예외처리(기존꺼 삭제)
-        if (dto.getId() != null && dto.getId() > 0 && dto.getTempFl().equals(0)) {
+        if (StringUtils.hasText(dto.getId()) && dto.getTempFl().equals(0)) {
             Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
             if (surveyOpt.isEmpty()) {
                 throw new ObjectNotFoundException("no survey");
@@ -112,10 +116,11 @@ public class SurveyServiceImpl implements SurveyService {
                 throw new AuthFailException("it`s not your survey");
             }
 
-            repo.deleteById(dto.getId());
+            repo.delete(Survey.builder().id(dto.getId()).build());
         }
 
         Survey saveSurvey = repo.save(Survey.builder()
+                .id(pkManager.createOrUpdateByTableName(Survey.NAME))
                 .user(User.builder().id(dto.getUserId()).build())
                 .subject(dto.getSubject())
                 .content(dto.getContent())
@@ -146,6 +151,7 @@ public class SurveyServiceImpl implements SurveyService {
         List<SectionDto.Create> sectionList = dto.getSectionList();
         sectionList.forEach(section -> {
             Section saveSection = sectionRepo.save(Section.builder()
+                    .id(pkManager.createOrUpdateByTableName(Section.NAME))
                     .survey(Survey.builder().id(saveSurvey.getId()).build())
                     .title(section.getTitle())
                     .content(section.getContent())
@@ -155,6 +161,7 @@ public class SurveyServiceImpl implements SurveyService {
             List<QuestionDto.Create> questionList = section.getQuestionList();
             questionList.forEach(question -> {
                 Question saveQuestion = questionRepo.save(Question.builder()
+                        .id(pkManager.createOrUpdateByTableName(Question.NAME))
                         .section(Section.builder().id(saveSection.getId()).build())
                         .ask(question.getAsk())
                         .descrip(question.getDescrip())
@@ -162,11 +169,13 @@ public class SurveyServiceImpl implements SurveyService {
                         .multiFl(question.getMultiFl())
                         .duplFl(question.getDupFl())
                         .essFl(question.getEssFl())
+                        .randomShowFl(question.getRandomShowFl())
                         .build());
 
                 List<QuestionItemDto.Create> questionItemList = question.getQuestionItemList();
                 questionItemList.forEach(item -> {
                     questionItemRepo.save(QuestionItem.builder()
+                            .id(pkManager.createOrUpdateByTableName(QuestionItem.NAME))
                             .question(Question.builder().id(saveQuestion.getId()).build())
                             .content(item.getContent())
                             .oder(item.getOder())
@@ -183,7 +192,7 @@ public class SurveyServiceImpl implements SurveyService {
                     .value(Point.CREATE_SURVEY_VALUE)
                     .reason(Point.CREATE_SURVEY_REASON)
                     .tablePk(saveSurvey.getId())
-                    .tableName("survey")
+                    .tableName(Survey.NAME)
                     .build());
 
             // save experience
@@ -192,7 +201,7 @@ public class SurveyServiceImpl implements SurveyService {
                     .value(Experience.CREATE_SURVEY_VALUE)
                     .reason(Experience.CREATE_SURVEY_REASON)
                     .tablePk(saveSurvey.getId())
-                    .tableName("survey")
+                    .tableName(Survey.NAME)
                     .build());
         }
 

@@ -14,10 +14,11 @@ import java.time.LocalDate;
 @DynamicInsert
 @DynamicUpdate
 public class Survey extends CommonDate {
+    public final static String NAME = "survey";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -48,7 +49,7 @@ public class Survey extends CommonDate {
     private String closingComment;
 
     @Builder
-    public Survey(Long id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment) {
+    public Survey(String id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment) {
         this.id = id;
         this.user = user;
         this.subject = subject;

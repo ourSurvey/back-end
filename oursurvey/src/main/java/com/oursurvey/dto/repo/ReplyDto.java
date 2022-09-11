@@ -12,7 +12,7 @@ public class ReplyDto {
     @Builder
     public static class Create {
         private Long userId;
-        private Long surveyId;
+        private String surveyId;
         private List<AnswerDto.Create> answerList;
 
         public void setUserId(Long userId) {

@@ -51,7 +51,7 @@ public class SurveyController {
     }
 
     @GetMapping("/{id}")
-    public MyResponse get(@PathVariable Long id) {
+    public MyResponse get(@PathVariable String id) {
         MyResponse res = new MyResponse();
         Optional<SurveyDto.Detail> opt = surveyService.findById(id);
         if (opt.isEmpty()) {
@@ -84,7 +84,7 @@ public class SurveyController {
 
     private SurveyDto.Create getSurveyFromJson(JSONObject object) {
         return SurveyDto.Create.builder()
-                .id(object.getLong("id"))
+                .id(object.getString("id"))
                 .subject(object.getString("subject"))
                 .content(object.getString("content"))
                 .startDate(object.getString("startDate"))
@@ -128,6 +128,7 @@ public class SurveyController {
                     .multiFl(question.getInt("multiFl"))
                     .essFl(question.getInt("essFl"))
                     .dupFl(question.getInt("dupFl"))
+                    .randomShowFl(question.getInt("randomShowFl"))
                     .oder(question.getInt("oder"))
                     .questionItemList(getQuestionItemDtoList(question.getJSONArray("questionItems")))
                     .build());

@@ -20,7 +20,7 @@ public class QuestionItemDto {
     @AllArgsConstructor
     @Builder
     public static class Detail {
-        private Long id;
+        private String id;
         private String content;
         private Integer oder;
         private Long nextSection;

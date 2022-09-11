@@ -31,7 +31,7 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
     }
 
     @Override
-    public Optional<Survey> getFromId(Long id) {
+    public Optional<Survey> getFromId(String id) {
         return Optional.ofNullable(getBaseJoin().where(survey.id.eq(id)).fetchOne());
     }
 
@@ -57,7 +57,7 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
                 .groupBy(survey.id)
                 .orderBy(survey.createDt.desc());
 
-        JPAQuery<Long> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
+        JPAQuery<String> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
                 .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
                 .groupBy(survey.id)
                 .orderBy(survey.createDt.desc());

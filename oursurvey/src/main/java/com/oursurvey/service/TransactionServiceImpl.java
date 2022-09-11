@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .user(User.builder().id(pointDto.getUserId()).build())
                 .value(pointDto.getValue())
                 .reason(pointDto.getReason())
-                .tablePk(pointDto.getTablePk())
+                .tablePk(String.valueOf(pointDto.getTablePk()))
                 .tableName(pointDto.getTableName())
                 .build());
 
@@ -43,7 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .user(User.builder().id(experienceDto.getUserId()).build())
                 .value(experienceDto.getValue())
                 .reason(experienceDto.getReason())
-                .tablePk(experienceDto.getTablePk())
+                .tablePk(String.valueOf(experienceDto.getTablePk()))
                 .tableName(experienceDto.getTableName())
                 .build());
     }
