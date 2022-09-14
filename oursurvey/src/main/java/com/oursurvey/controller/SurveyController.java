@@ -5,7 +5,9 @@ import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.Point;
 import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.exception.PointLackException;
+import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
+import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.service.survey.SurveyService;
 import com.oursurvey.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -31,7 +31,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SurveyController {
     private final SurveyService surveyService;
+    private final ReplyService replyService;
+    private final AnswerService answerService;
     private final PointService pointService;
+
     private final JwtUtil jwtUtil;
 
     @SchemaMapping(typeName = "Query", value = "getSurveyToPage")
@@ -79,6 +82,39 @@ public class SurveyController {
 
         // save survey
         surveyService.create(surveyDto);
+        return res;
+    }
+
+    // 설문 개별결과
+    @GetMapping("/result/each/{surveyId}")
+    public MyResponse resultEach(@PathVariable String surveyId) {
+        MyResponse res = new MyResponse();
+
+        HashMap<String, Object> dataMap = new HashMap<>();
+
+        Optional<SurveyDto.Detail> opt = surveyService.findById(surveyId);
+        if (opt.isEmpty()) {
+            throw new ObjectNotFoundException("no survey");
+        }
+        dataMap.put("survey", opt.get());
+
+        List<Long> replyIdList = replyService.findIdBySurveyId(surveyId);
+        dataMap.put("replyIdList", replyIdList);
+
+        if (replyIdList.size() > 0) {
+            Long firstReplyId = replyIdList.get(0);
+            List<AnswerDto.Base> answerList = answerService.findByReplyId(firstReplyId);
+            dataMap.put("reply_" + firstReplyId, answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse)));
+        }
+
+        return res.setData(dataMap);
+    }
+
+    // 설문 결과 요약
+    @GetMapping("/result/summary/{surveyId}")
+    public MyResponse result(@PathVariable String surveyId) {
+        MyResponse res = new MyResponse();
+
         return res;
     }
 

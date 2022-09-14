@@ -19,4 +19,14 @@ public class ReplyDto {
             this.userId = userId;
         }
     }
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class MyList {
+        private Long id;
+
+        public MyList(Long id) {
+            this.id = id;
+        }
+    }
 }

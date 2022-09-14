@@ -4,7 +4,7 @@ schema {
 }
 
 type SurveyDto {
-    id: Int!,
+    id: String!,
     subject: String!,
     content: String!,
     openFl: Int!,

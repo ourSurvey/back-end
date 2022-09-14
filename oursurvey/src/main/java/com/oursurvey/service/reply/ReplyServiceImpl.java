@@ -1,9 +1,9 @@
 package com.oursurvey.service.reply;
 
-import com.oursurvey.dto.repo.AnswerDto;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.*;
 import com.oursurvey.exception.AlreadyReplySurveyException;
+import com.oursurvey.exception.InvalidSurveyPeriodException;
 import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.repo.answer.AnswerRepo;
 import com.oursurvey.repo.experience.ExperienceRepo;
@@ -11,13 +11,13 @@ import com.oursurvey.repo.point.PointRepo;
 import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.reply.ReplyRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
-import com.oursurvey.repo.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +39,14 @@ public class ReplyServiceImpl implements ReplyService {
         Optional<Survey> surveyOpt = surveyRepo.getFromId(dto.getSurveyId());
         if (surveyOpt.isEmpty()) {
             throw new ObjectNotFoundException("no survey");
+        }
+
+        // 유효하지 않은 기간에 참여
+        LocalDate now = LocalDate.now();
+        Survey survey = surveyOpt.get();
+        if (now.isBefore(survey.getStartDate()) && now.isAfter(survey.getEndDate())) {
+            throw new InvalidSurveyPeriodException("invalid period");
+
         }
 
         // 중복 참여 불가
@@ -94,5 +102,15 @@ public class ReplyServiceImpl implements ReplyService {
         }
 
         return saveReply.getId();
+    }
+
+    @Override
+    public List<ReplyDto.MyList> findByUserId(Long userId) {
+        return repo.getByUserId(userId);
+    }
+
+    @Override
+    public List<Long> findIdBySurveyId(String id) {
+        return repo.getIdBySurveyId(id);
     }
 }

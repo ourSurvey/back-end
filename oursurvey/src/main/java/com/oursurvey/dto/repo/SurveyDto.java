@@ -80,4 +80,46 @@ public class SurveyDto {
             return this;
         }
     }
+
+    // 마이페이지 나의 서베이
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class MyList {
+        private String id;
+        private String subject;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate startDate;
+        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDate endDate;
+        private Integer tempFl;
+        private Long replyCount;
+        private Integer status;
+
+        public MyList(String id, String subject, LocalDate startDate, LocalDate endDate, Integer tempFl, Long replyCount) {
+            this.id = id;
+            this.subject = subject;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.tempFl = tempFl;
+            this.replyCount = replyCount;
+        }
+
+        public void setStatus(Integer status) {
+            this.status = status;
+        }
+    }
+
+    // 마이페이지 나의 서베이 임시저장
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class MyListTemp {
+        private String id;
+        private String subject;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
+        private LocalDateTime createdDt;
+    }
 }

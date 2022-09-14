@@ -12,4 +12,16 @@ public class AnswerDto {
         private String questionId;
         private String value;
     }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class Base {
+        private Long id;
+        private Long replyId;
+        private String questionId;
+        private String response;
+    }
 }

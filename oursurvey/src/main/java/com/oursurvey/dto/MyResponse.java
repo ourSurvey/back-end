@@ -14,7 +14,9 @@ public class MyResponse {
     public static final Integer DUPLICATE_EMAIL = 401;         // 회원가입시 이메일 중복 에러
     public static final Integer NOT_FOUND = 404;               // 404
     public static final Integer POINT_LACK = 410;              // point 부족
-    public static final Integer S3_FILE_UPLOAD = 450;              // s3 파일업로드 에러
+    public static final Integer INVALID_SURVEY_PERIOD = 430;   // 서베이 기간 에러
+    public static final Integer ALREADY_REPLY_SURVEY = 431;    // 서베이 중복참여 에러
+    public static final Integer S3_FILE_UPLOAD = 450;          // s3 파일업로드 에러
     public static final Integer INVALID_TOKEN = 480;           // jwt 토큰 형식이 아님
     public static final Integer INVALID_ACCESSTOKEN = 481;     // jwt access token 에러
     public static final Integer INVALID_REFRESHTOKEN = 482;    // jwt refresh token 에러

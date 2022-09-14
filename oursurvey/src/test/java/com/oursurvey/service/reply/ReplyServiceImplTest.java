@@ -14,11 +14,4 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReplyServiceImplTest {
     @Autowired
     ReplyRepo repo;
-
-    @Test
-    void test() {
-        Optional<Reply> opt = repo.getBySurveyIdUserId(1L, null);
-        System.out.println("opt = " + opt);
-
-    }
 }

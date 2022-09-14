@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class JobConfig {
     private final ExperienceService experienceService;
 
-    @Scheduled(fixedRate = 60 * 60 * 24, timeUnit = TimeUnit.SECONDS)
+    // @Scheduled(fixedRate = 60 * 60 * 24, timeUnit = TimeUnit.SECONDS)
     public void recentAppVersion() {
         experienceService.findSumAndPromoting();
     }

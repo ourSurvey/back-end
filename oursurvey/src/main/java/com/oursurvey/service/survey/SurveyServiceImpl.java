@@ -1,6 +1,5 @@
 package com.oursurvey.service.survey;
 
-import com.amazonaws.transform.SimpleTypeUnmarshallers;
 import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.*;
 import com.oursurvey.exception.AuthFailException;
@@ -13,7 +12,6 @@ import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.questionitem.QuestionItemRepo;
 import com.oursurvey.repo.section.SectionRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
-import com.oursurvey.service.TransactionService;
 import com.oursurvey.service.pkmanager.PkManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -211,5 +209,19 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public Page<SurveyDto.Lizt> find(Pageable pageable) {
         return repo.get(pageable);
+    }
+
+    @Override
+    public List<SurveyDto.MyList> findByUserId(Long userId) {
+        return repo.getByUserId(userId);
+    }
+
+    @Override
+    public List<SurveyDto.MyListTemp> findTempByUserId(Long userId) {
+        return repo.getTempByUserId(userId).stream().map(e -> SurveyDto.MyListTemp.builder()
+                .id(e.getId())
+                .subject(e.getSubject())
+                .createdDt(e.getCreateDt())
+                .build()).toList();
     }
 }

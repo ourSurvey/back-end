@@ -5,6 +5,7 @@ import com.oursurvey.dto.repo.AnswerDto;
 import com.oursurvey.dto.repo.PointDto;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.Point;
+import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.util.JwtUtil;
@@ -15,16 +16,14 @@ import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -32,8 +31,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReplyController {
     private final ReplyService service;
+    private final AnswerService answerService;
     private final PointService pointService;
+
     private final JwtUtil jwtUtil;
+
+    @GetMapping("/{id}")
+    public MyResponse get(@PathVariable Long id) {
+        MyResponse res = new MyResponse();
+        List<AnswerDto.Base> answerList = answerService.findByReplyId(id);
+        return res.setData(answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse)));
+    }
 
     // NOTE. [point ++, experience ++]
     @PostMapping

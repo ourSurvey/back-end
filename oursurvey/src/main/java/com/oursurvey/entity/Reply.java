@@ -20,7 +20,6 @@ public class Reply extends CommonDate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    // @Column(name = "user_id")
     private User user=null;
 
     @ManyToOne(fetch = FetchType.LAZY)

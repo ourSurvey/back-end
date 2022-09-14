@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static com.oursurvey.entity.QHashtag.hashtag;
 import static com.oursurvey.entity.QHashtagSurvey.hashtagSurvey;
+import static com.oursurvey.entity.QReply.reply;
 import static com.oursurvey.entity.QSurvey.survey;
 import static com.oursurvey.entity.QUser.user;
 
@@ -63,5 +64,29 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
                 .orderBy(survey.createDt.desc());
 
         return PageableExecutionUtils.getPage(query.fetch(), pageable, () -> countQuery.fetch().size());
+    }
+
+    @Override
+    public List<SurveyDto.MyList> getByUserId(Long userId) {
+        return factory.select(
+                        Projections.constructor(
+                                SurveyDto.MyList.class,
+                                survey.id,
+                                survey.subject,
+                                survey.startDate,
+                                survey.endDate,
+                                survey.tempFl,
+                                reply.count()
+                        )
+                ).from(survey).leftJoin(reply).on(survey.id.eq(reply.survey.id))
+                .where(survey.user.id.eq(userId).and(survey.tempFl.eq(0)))
+                .groupBy(survey.id)
+                .orderBy(survey.startDate.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Survey> getTempByUserId(Long userId) {
+        return factory.selectFrom(survey).where(survey.user.id.eq(userId).and(survey.tempFl.eq(1))).fetch();
     }
 }

@@ -25,6 +25,8 @@ public class ExceptionAdvice {
             InvalidRefreshTokenException.class,
             CertifiedException.class,
             S3FileUploadException.class,
+            InvalidSurveyPeriodException.class,
+            AlreadyReplySurveyException.class,
             RuntimeException.class
     })
     public MyResponse exceptionFor400(Exception e) {
@@ -36,6 +38,8 @@ public class ExceptionAdvice {
         if (e instanceof InvalidRefreshTokenException) myResponse.setCode(MyResponse.INVALID_REFRESHTOKEN);
         if (e instanceof CertifiedException) myResponse.setCode(MyResponse.INVALID_CERTIFIED_CODE);
         if (e instanceof S3FileUploadException) myResponse.setCode(MyResponse.S3_FILE_UPLOAD);
+        if (e instanceof InvalidSurveyPeriodException) myResponse.setCode(MyResponse.INVALID_SURVEY_PERIOD);
+        if (e instanceof AlreadyReplySurveyException) myResponse.setCode(MyResponse.ALREADY_REPLY_SURVEY);
         return myResponse;
     }
 
