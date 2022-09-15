@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +92,6 @@ public class SurveyController {
         MyResponse res = new MyResponse();
 
         HashMap<String, Object> dataMap = new HashMap<>();
-
         Optional<SurveyDto.Detail> opt = surveyService.findById(surveyId);
         if (opt.isEmpty()) {
             throw new ObjectNotFoundException("no survey");
@@ -115,7 +115,71 @@ public class SurveyController {
     public MyResponse result(@PathVariable String surveyId) {
         MyResponse res = new MyResponse();
 
-        return res;
+        HashMap<String, Object> dataMap = new HashMap<>();
+        Optional<SurveyDto.Detail> opt = surveyService.findById(surveyId);
+        if (opt.isEmpty()) {
+            throw new ObjectNotFoundException("no survey");
+        }
+        dataMap.put("survey", opt.get());
+
+        ArrayList<QuestionDto.Summary> summaryList = new ArrayList<>();
+
+        SurveyDto.Detail surveyDetail = opt.get();
+        List<SectionDto.Detail> sectionList = surveyDetail.getSectionList();
+        sectionList.forEach(section -> {
+            section.getQuestionList().forEach(question -> {
+                QuestionDto.Summary summaryElem = new QuestionDto.Summary(question.getId(), question.getMultiFl());
+                if (question.getQuestionItemList().size() > 0) {
+                    question.getQuestionItemList().forEach(item -> summaryElem.addToMap(item.getId(), 0));
+                }
+                summaryList.add(summaryElem);
+            });
+        });
+
+        // question의 대한 answer 리스트들
+        List<AnswerDto.Base> answerList = answerService.findByQuestionIds(summaryList.stream().map(QuestionDto.Summary::getId).toList());
+        answerList.forEach(e -> {
+            QuestionDto.Summary summary = summaryList.stream().filter(q -> q.getId().equals(e.getQuestionId())).findFirst().get();
+            summary.setNoReplyFalse();
+            HashMap<String, Integer> multiMap = summary.getMultiMap();
+
+            if (summary.getMultiFl().equals(1)) {
+                if (StringUtils.hasText(e.getResponse())) {
+                    JSONArray responseArray = new JSONArray(e.getResponse());
+                    for (Object o : responseArray) {
+                        multiMap.replace(o.toString(), multiMap.get(o.toString()) + 1);
+                        summary.plusAnswerCount();
+                    }
+                } else {
+                    if (!multiMap.containsKey("noreply")) {
+                        multiMap.put("noreply", 1);
+                    } else {
+                        multiMap.replace("noreply", (multiMap.get("noreply")) + 1);
+                    }
+                    summary.plusAnswerCount();
+                }
+            } else {
+                if (StringUtils.hasText(e.getResponse())) {
+                    summary.addToList(e.getResponse());
+                } else {
+                    summary.addToList("noreply");
+                }
+
+                summary.plusAnswerCount();
+            }
+        });
+
+        // 퍼센트 계산
+        for (QuestionDto.Summary s : summaryList) {
+            if (s.getMultiFl().equals(1) && s.getAnswerCount() > 0) {
+                for (Map.Entry<String, Integer> set : s.getMultiMap().entrySet()) {
+                    s.getMultiMap().replace(set.getKey(), Math.round((float) set.getValue() / s.getAnswerCount() * 100));
+                }
+            }
+        }
+        dataMap.put("questionSummarys", summaryList);
+
+        return res.setData(dataMap);
     }
 
     private SurveyDto.Create getSurveyFromJson(JSONObject object) {

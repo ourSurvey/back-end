@@ -1,6 +1,7 @@
 package com.oursurvey.service.reply;
 
 import com.oursurvey.dto.repo.ReplyDto;
+import com.oursurvey.entity.Reply;
 
 import java.util.List;
 

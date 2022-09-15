@@ -19,6 +19,7 @@ public class ReplyDto {
             this.userId = userId;
         }
     }
+
     @Getter
     @ToString
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

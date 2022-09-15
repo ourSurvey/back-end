@@ -15,6 +15,11 @@ public class AnswerRepoImpl implements AnswerRepoCustom {
     private final JPAQueryFactory factory;
 
     @Override
+    public List<Answer> getByQuestionIds(List<String> questionIds) {
+        return factory.selectFrom(answer).where(answer.question.id.in(questionIds)).fetch();
+    }
+
+    @Override
     public List<Answer> getByReplyId(Long id) {
         return factory.selectFrom(answer).where(answer.reply.id.eq(id)).fetch();
     }

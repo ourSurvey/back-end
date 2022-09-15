@@ -18,6 +18,11 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepo repo;
 
     @Override
+    public List<AnswerDto.Base> findByQuestionIds(List<String> questionIds) {
+        return repo.getByQuestionIds(questionIds).stream().map(this::entityToDto).toList();
+    }
+
+    @Override
     public List<AnswerDto.Base> findByReplyId(Long id) {
         return repo.getByReplyId(id).stream().map(this::entityToDto).toList();
     }

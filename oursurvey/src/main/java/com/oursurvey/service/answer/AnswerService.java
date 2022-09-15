@@ -6,6 +6,7 @@ import com.oursurvey.entity.Answer;
 import java.util.List;
 
 public interface AnswerService {
+    List<AnswerDto.Base> findByQuestionIds(List<String> questionIds);
     List<AnswerDto.Base> findByReplyId(Long id);
 
     default AnswerDto.Base entityToDto(Answer entity) {

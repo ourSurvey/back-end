@@ -70,6 +70,7 @@ public class SurveyServiceImpl implements SurveyService {
                         .multiFl(question.getMultiFl())
                         .essFl(question.getEssFl())
                         .dupFl(question.getDuplFl())
+                        .randomShowFl(question.getRandomShowFl())
                         .oder(question.getOder())
                         .questionItemList(questionItemDetailDtoList)
                         .build();
