@@ -72,11 +72,6 @@ public class SurveyController {
         MyResponse res = new MyResponse();
 
         Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
-        Integer sumPoint = pointService.findSumByUserId(id);
-        if (sumPoint < -(Point.CREATE_SURVEY_VALUE)) {
-            throw new PointLackException("lack point");
-        }
-
         JSONObject object = new JSONObject(json);
         SurveyDto.Create surveyDto = getSurveyFromJson(object);
         surveyDto.setUserId(id);
@@ -180,6 +175,14 @@ public class SurveyController {
         dataMap.put("questionSummarys", summaryList);
 
         return res.setData(dataMap);
+    }
+
+    // NOTE. [point ++, experience ++]
+    @GetMapping("/pull/{surveyId}")
+    public MyResponse pull(HttpServletRequest request, @PathVariable String surveyId) {
+        MyResponse res = new MyResponse();
+        surveyService.pullSurvey(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)), surveyId);
+        return res;
     }
 
     private SurveyDto.Create getSurveyFromJson(JSONObject object) {

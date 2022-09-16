@@ -13,4 +13,5 @@ public interface SurveyService {
     Page<SurveyDto.Lizt> find(Pageable pageable);
     List<SurveyDto.MyList> findByUserId(Long userId);
     List<SurveyDto.MyListTemp> findTempByUserId(Long userId);
+    void pullSurvey(Long userId, String surveyId);
 }

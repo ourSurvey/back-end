@@ -4,6 +4,7 @@ import com.oursurvey.dto.repo.*;
 import com.oursurvey.entity.*;
 import com.oursurvey.exception.AuthFailException;
 import com.oursurvey.exception.ObjectNotFoundException;
+import com.oursurvey.exception.PointLackException;
 import com.oursurvey.repo.experience.ExperienceRepo;
 import com.oursurvey.repo.hashtag.HashtagRepo;
 import com.oursurvey.repo.hashtagsurvey.HashtagSurveyRepo;
@@ -12,7 +13,11 @@ import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.questionitem.QuestionItemRepo;
 import com.oursurvey.repo.section.SectionRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
+import com.oursurvey.repo.topsurvey.TopSurveyRepo;
+import com.oursurvey.repo.user.UserRepo;
+import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.pkmanager.PkManagerService;
+import com.oursurvey.service.point.PointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,7 +43,12 @@ public class SurveyServiceImpl implements SurveyService {
     private final ExperienceRepo experienceRepo;
     private final HashtagRepo hashtagRepo;
     private final HashtagSurveyRepo hashtagSurveyRepo;
+    private final TopSurveyRepo topSurveyRepo;
+
     private final PkManagerService pkManager;
+    private final PointService pointService;
+    private final ExperienceService experienceService;
+    private final UserRepo userRepo;
 
     @Override
     public Optional<SurveyDto.Detail> findById(String id) {
@@ -103,18 +113,22 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String create(SurveyDto.Create dto) {
+        Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
+        if (surveyOpt.isEmpty()) {
+            throw new ObjectNotFoundException("no survey");
+        }
+
+        Survey survey = surveyOpt.get();
+        if (!survey.getUser().getId().equals(dto.getUserId())) {
+            throw new AuthFailException("it`s not your survey");
+        }
+
+        if (pointService.findSumByUserId(dto.getUserId()) < -(Point.CREATE_SURVEY_VALUE)) {
+            throw new PointLackException();
+        }
+
         // 임시 -> 실제 전환시 예외처리(기존꺼 삭제)
         if (StringUtils.hasText(dto.getId()) && dto.getTempFl().equals(0)) {
-            Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
-            if (surveyOpt.isEmpty()) {
-                throw new ObjectNotFoundException("no survey");
-            }
-
-            Survey survey = surveyOpt.get();
-            if (!dto.getUserId().equals(survey.getUser().getId())) {
-                throw new AuthFailException("it`s not your survey");
-            }
-
             repo.delete(Survey.builder().id(dto.getId()).build());
         }
 
@@ -224,5 +238,43 @@ public class SurveyServiceImpl implements SurveyService {
                 .subject(e.getSubject())
                 .createdDt(e.getCreateDt())
                 .build()).toList();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void pullSurvey(Long userId, String surveyId) {
+        Optional<Survey> opt = repo.getFromId(surveyId);
+        if (opt.isEmpty()) {
+            throw new ObjectNotFoundException("no survey");
+        }
+        Survey survey = opt.get();
+
+        if (!survey.getUser().getId().equals(userId)) {
+            throw new AuthFailException("it`s not your survey");
+        }
+
+        if (pointService.findSumByUserId(userId) < -(Point.PULLING_SURVEY_VALUE)) {
+            throw new PointLackException();
+        }
+
+        TopSurvey saveTopSurvey = topSurveyRepo.save(TopSurvey.builder()
+                .survey(Survey.builder().id(surveyId).build())
+                .build());
+
+        pointRepo.save(Point.builder()
+                .user(User.builder().id(userId).build())
+                .value(Point.PULLING_SURVEY_VALUE)
+                .reason(Point.PULLING_SURVEY_REASON)
+                .tablePk(saveTopSurvey.getId().toString())
+                .tableName("top_survey")
+                .build());
+
+        experienceRepo.save(Experience.builder()
+                .user(User.builder().id(userId).build())
+                .value(Experience.PULLING_SURVEY_VALUE)
+                .reason(Experience.PULLING_SURVEY_REASON)
+                .tablePk(saveTopSurvey.getId().toString())
+                .tableName("top_survey")
+                .build());
     }
 }
