@@ -2,9 +2,7 @@ package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.*;
-import com.oursurvey.entity.Point;
 import com.oursurvey.exception.ObjectNotFoundException;
-import com.oursurvey.exception.PointLackException;
 import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
@@ -181,7 +179,7 @@ public class SurveyController {
     @GetMapping("/pull/{surveyId}")
     public MyResponse pull(HttpServletRequest request, @PathVariable String surveyId) {
         MyResponse res = new MyResponse();
-        surveyService.pullSurvey(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)), surveyId);
+        surveyService.pull(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)), surveyId);
         return res;
     }
 

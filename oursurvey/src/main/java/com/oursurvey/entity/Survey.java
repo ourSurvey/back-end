@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name = "survey")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,8 +49,11 @@ public class Survey extends CommonDate {
     @Column(name = "closing_comment")
     private String closingComment;
 
+    @Column(name = "pull_date", nullable = true)
+    private LocalDateTime pullDate;
+
     @Builder
-    public Survey(String id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment) {
+    public Survey(String id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment, LocalDateTime pullDate) {
         this.id = id;
         this.user = user;
         this.subject = subject;
@@ -60,5 +64,10 @@ public class Survey extends CommonDate {
         this.openFl = openFl;
         this.tempFl = tempFl;
         this.closingComment = closingComment;
+        this.pullDate = pullDate;
+    }
+
+    public void pullUp() {
+        this.pullDate = LocalDateTime.now();
     }
 }

@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS `logged_in`;
 DROP TABLE IF EXISTS `file`;
-DROP TABLE IF EXISTS `top_survey`;
 DROP TABLE IF EXISTS `experience`;
 DROP TABLE IF EXISTS `hashtag_survey`;
 DROP TABLE IF EXISTS `hashtag`;
@@ -29,7 +28,6 @@ CREATE TABLE IF NOT EXISTS `answer` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `experience` (
-    `id` bigint NOT NULL AUTO_INCREMENT,
     `user_id` bigint NOT NULL,
     `value` int NOT NULL,
     `reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -204,21 +202,12 @@ CREATE TABLE IF NOT EXISTS `survey` (
     `open_fl` tinyint NOT NULL,
     `temp_fl` tinyint NOT NULL,
     `closing_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+    `pull_date` DATETIME NULL DEFAULT NULL,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `FK_survey_user` (`user_id`),
     CONSTRAINT `FK_survey_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE IF NOT EXISTS `top_survey` (
-    `id` bigint NOT NULL AUTO_INCREMENT,
-    `survey_id` varchar(14) COLLATE utf8mb4_general_ci NOT NULL,
-    `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `FK_top_survey_survey` (`survey_id`),
-    CONSTRAINT `FK_top_survey_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `user` (

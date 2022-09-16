@@ -56,12 +56,11 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .groupBy(survey.id)
-                .orderBy(survey.createDt.desc());
+                .orderBy(survey.pullDate.desc(), survey.createDt.desc());
 
         JPAQuery<String> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
                 .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
-                .groupBy(survey.id)
-                .orderBy(survey.createDt.desc());
+                .groupBy(survey.id);
 
         return PageableExecutionUtils.getPage(query.fetch(), pageable, () -> countQuery.fetch().size());
     }

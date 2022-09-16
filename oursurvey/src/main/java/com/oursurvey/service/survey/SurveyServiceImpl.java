@@ -13,7 +13,6 @@ import com.oursurvey.repo.question.QuestionRepo;
 import com.oursurvey.repo.questionitem.QuestionItemRepo;
 import com.oursurvey.repo.section.SectionRepo;
 import com.oursurvey.repo.survey.SurveyRepo;
-import com.oursurvey.repo.topsurvey.TopSurveyRepo;
 import com.oursurvey.repo.user.UserRepo;
 import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.pkmanager.PkManagerService;
@@ -43,7 +42,6 @@ public class SurveyServiceImpl implements SurveyService {
     private final ExperienceRepo experienceRepo;
     private final HashtagRepo hashtagRepo;
     private final HashtagSurveyRepo hashtagSurveyRepo;
-    private final TopSurveyRepo topSurveyRepo;
 
     private final PkManagerService pkManager;
     private final PointService pointService;
@@ -242,7 +240,7 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void pullSurvey(Long userId, String surveyId) {
+    public void pull(Long userId, String surveyId) {
         Optional<Survey> opt = repo.getFromId(surveyId);
         if (opt.isEmpty()) {
             throw new ObjectNotFoundException("no survey");
@@ -257,24 +255,22 @@ public class SurveyServiceImpl implements SurveyService {
             throw new PointLackException();
         }
 
-        TopSurvey saveTopSurvey = topSurveyRepo.save(TopSurvey.builder()
-                .survey(Survey.builder().id(surveyId).build())
-                .build());
+        survey.pullUp();
 
         pointRepo.save(Point.builder()
                 .user(User.builder().id(userId).build())
                 .value(Point.PULLING_SURVEY_VALUE)
                 .reason(Point.PULLING_SURVEY_REASON)
-                .tablePk(saveTopSurvey.getId().toString())
-                .tableName("top_survey")
+                .tablePk(survey.getId())
+                .tableName("survey")
                 .build());
 
         experienceRepo.save(Experience.builder()
                 .user(User.builder().id(userId).build())
                 .value(Experience.PULLING_SURVEY_VALUE)
                 .reason(Experience.PULLING_SURVEY_REASON)
-                .tablePk(saveTopSurvey.getId().toString())
-                .tableName("top_survey")
+                .tablePk(survey.getId())
+                .tableName("survey")
                 .build());
     }
 }
