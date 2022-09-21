@@ -253,7 +253,21 @@ public class AuthController {
         MyResponse res = new MyResponse();
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null) {
+            throw new InvalidTokenException();
+        }
+
+        Boolean validate = jwtUtil.validateToken(header);
+        if (!validate) {
+            throw new InvalidTokenException();
+        }
+
         Claims claims = jwtUtil.parseToken(header);
+        String subject = claims.getSubject();
+        String tokenType = claims.get("tokenType", String.class);
+        if (!subject.equals("refreshToken") || !tokenType.equals("refresh")) {
+            throw new InvalidRefreshTokenException();
+        }
 
         Long id = claims.get("id", Long.class);
         TokenDto token = jwtUtil.createToken(id, true);
@@ -268,20 +282,19 @@ public class AuthController {
         MyResponse res = new MyResponse();
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
-            return res.setData(false);
+            return res.setCode(MyResponse.INVALID_TOKEN).setData(false);
         }
 
         Boolean validate = jwtUtil.validateToken(header);
         if (!validate) {
-            return res.setData(false);
+            return res.setCode(MyResponse.INVALID_TOKEN).setData(false);
         }
 
         Claims claims = jwtUtil.parseToken(header);
         String subject = claims.getSubject();
         String tokenType = claims.get("tokenType", String.class);
-
         if (!subject.equals("accessToken") || !tokenType.equals("access")) {
-            return res.setData(false);
+            return res.setCode(MyResponse.INVALID_ACCESSTOKEN).setData(false);
         }
 
         return res.setData(true);
