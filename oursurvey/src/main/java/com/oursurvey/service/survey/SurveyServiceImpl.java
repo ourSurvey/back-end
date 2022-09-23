@@ -111,22 +111,22 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String create(SurveyDto.Create dto) {
-        Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
-        if (surveyOpt.isEmpty()) {
-            throw new ObjectNotFoundException("no survey");
-        }
-
-        Survey survey = surveyOpt.get();
-        if (!survey.getUser().getId().equals(dto.getUserId())) {
-            throw new AuthFailException("it`s not your survey");
-        }
-
         if (pointService.findSumByUserId(dto.getUserId()) < -(Point.CREATE_SURVEY_VALUE)) {
             throw new PointLackException();
         }
 
         // 임시 -> 실제 전환시 예외처리(기존꺼 삭제)
         if (StringUtils.hasText(dto.getId()) && dto.getTempFl().equals(0)) {
+            Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
+            if (surveyOpt.isEmpty()) {
+                throw new ObjectNotFoundException("no survey");
+            }
+
+            Survey survey = surveyOpt.get();
+            if (!survey.getUser().getId().equals(dto.getUserId())) {
+                throw new AuthFailException("it`s not your survey");
+            }
+
             repo.delete(Survey.builder().id(dto.getId()).build());
         }
 

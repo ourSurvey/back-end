@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS `answer` (
     PRIMARY KEY (`id`),
     KEY `FK_answer_reply` (`reply_id`),
     KEY `FK_answer_question` (`question_id`),
-    CONSTRAINT `FK_answer_question` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT `FK_answer_reply` FOREIGN KEY (`reply_id`) REFERENCES `reply` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `FK_answer_question` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `FK_answer_reply` FOREIGN KEY (`reply_id`) REFERENCES `reply` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `experience` (
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `hashtag_survey` (
     KEY `FK_hashtag_survey_hashtag` (`hashtag_id`),
     KEY `FK_hashtag_survey_survey` (`survey_id`) USING BTREE,
     CONSTRAINT `FK_hashtag_survey_hashtag` FOREIGN KEY (`hashtag_id`) REFERENCES `hashtag` (`id`) ON DELETE RESTRICT,
-    CONSTRAINT `FK_hashtag_survey_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `FK_hashtag_survey_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `logged_in` (
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `question` (
     `updated_dt` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `FK_question_section` (`section_id`),
-    CONSTRAINT `FK_question_section` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `FK_question_section` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `question_item` (
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `question_item` (
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `FK_question_item_question` (`question_id`),
-    CONSTRAINT `FK_question_item_question` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `FK_question_item_question` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `reply` (
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `reply` (
     PRIMARY KEY (`id`),
     KEY `FK_reply_user` (`user_id`),
     KEY `FK_reply_survey` (`survey_id`),
-    CONSTRAINT `FK_reply_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE RESTRICT,
+    CONSTRAINT `FK_reply_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE CASCADE,
     CONSTRAINT `FK_reply_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `section` (
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `FK_section_survey` (`survey_id`),
-    CONSTRAINT `FK_section_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE RESTRICT
+    CONSTRAINT `FK_section_survey` FOREIGN KEY (`survey_id`) REFERENCES `survey` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `survey` (
