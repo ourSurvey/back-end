@@ -13,7 +13,7 @@ public class FileDto {
     public static class Base {
         private Long id;
         private Long userId;
-        private Long tablePk;
+        private String tablePk;
         private String tableName;
         private String originName;
         private String dir;

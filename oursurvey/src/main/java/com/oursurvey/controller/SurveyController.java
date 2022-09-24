@@ -63,6 +63,16 @@ public class SurveyController {
         return res.setData(opt.get());
     }
 
+    @GetMapping("/tempCheck")
+    public MyResponse beforeCreate(HttpServletRequest request) {
+        MyResponse res = new MyResponse();
+        HashMap<String, Object> dataMap = new HashMap<>();
+
+        List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)));
+        dataMap.put("tempCount", tempList.size());
+        dataMap.put("tempRecent", tempList.size() > 0 ? tempList.get(0) : null);
+        return res.setData(dataMap);
+    }
 
     // NOTE. [point ++, experience ++]
     @PostMapping

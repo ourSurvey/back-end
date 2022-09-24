@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -56,6 +57,11 @@ public class FileServiceImpl implements FileService {
         }
 
         return Optional.of(entityToDto(fileOpt.get()));
+    }
+
+    @Override
+    public List<FileDto.Base> findByPkName(String pk, String name) {
+        return null;
     }
 
     @Override

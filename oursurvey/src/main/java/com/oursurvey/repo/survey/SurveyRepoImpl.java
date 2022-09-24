@@ -86,6 +86,6 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
 
     @Override
     public List<Survey> getTempByUserId(Long userId) {
-        return factory.selectFrom(survey).where(survey.user.id.eq(userId).and(survey.tempFl.eq(1))).fetch();
+        return factory.selectFrom(survey).where(survey.user.id.eq(userId).and(survey.tempFl.eq(1))).orderBy(survey.createDt.desc()).fetch();
     }
 }

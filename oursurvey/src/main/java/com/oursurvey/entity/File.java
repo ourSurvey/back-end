@@ -24,7 +24,7 @@ public class File extends CommonDate {
     private User user;
 
     @Column(name = "table_pk")
-    private Long tablePk;
+    private String tablePk;
 
     @Column(name = "table_name")
     private String tableName;
@@ -45,7 +45,7 @@ public class File extends CommonDate {
     private String ext;
 
     @Builder
-    public File(Long id, User user, Long tablePk, String tableName, String originName, String dir, String name, String path, String ext) {
+    public File(Long id, User user, String tablePk, String tableName, String originName, String dir, String name, String path, String ext) {
         this.id = id;
         this.user = user;
         this.tablePk = tablePk;
@@ -57,7 +57,7 @@ public class File extends CommonDate {
         this.ext = ext;
     }
 
-    public void changeTablePkName(Long pk, String name) {
+    public void changeTablePkName(String pk, String name) {
         this.tablePk = pk;
         this.tableName = name;
     }

@@ -62,8 +62,12 @@ public class MyController {
     @GetMapping("/survey/temp")
     public MyResponse surveyTemp(HttpServletRequest request) {
         MyResponse res = new MyResponse();
-        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
-        return res.setData(surveyService.findTempByUserId(userId));
+        HashMap<String, Object> dataMap = new HashMap<>();
+
+        List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)));
+        dataMap.put("tempList", tempList);
+        dataMap.put("tempCount", tempList.size());
+        return res.setData(dataMap);
     }
 
 

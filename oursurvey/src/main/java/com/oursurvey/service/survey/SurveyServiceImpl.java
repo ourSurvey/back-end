@@ -115,8 +115,8 @@ public class SurveyServiceImpl implements SurveyService {
             throw new PointLackException();
         }
 
-        // 임시 -> 실제 전환시 예외처리(기존꺼 삭제)
-        if (StringUtils.hasText(dto.getId()) && dto.getTempFl().equals(0)) {
+        // 기존꺼 삭제
+        if (StringUtils.hasText(dto.getId())) {
             Optional<Survey> surveyOpt = repo.getFromId(dto.getId());
             if (surveyOpt.isEmpty()) {
                 throw new ObjectNotFoundException("no survey");
@@ -127,6 +127,7 @@ public class SurveyServiceImpl implements SurveyService {
                 throw new AuthFailException("it`s not your survey");
             }
 
+            // FIXME. 파일추가 되면 DELETE 로직 수정해야함
             repo.delete(Survey.builder().id(dto.getId()).build());
         }
 
@@ -214,6 +215,13 @@ public class SurveyServiceImpl implements SurveyService {
                     .tablePk(saveSurvey.getId())
                     .tableName(Survey.NAME)
                     .build());
+        } else {
+            // 임시 저장이라면 + 20개가 넘었다면 맨 마지막 삭제해야함
+            List<Survey> tempList = repo.getTempByUserId(dto.getUserId());
+            if (tempList.size() > 20) {
+                Survey lastSurvey = tempList.get(tempList.size() - 1);
+                repo.delete(Survey.builder().id(lastSurvey.getId()).build());
+            }
         }
 
         return saveSurvey.getId();
