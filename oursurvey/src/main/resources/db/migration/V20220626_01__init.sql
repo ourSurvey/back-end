@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS `question` (
     `dupl_fl` tinyint NOT NULL,
     `ess_fl` tinyint NOT NULL,
     `random_show_fl` tinyint NOT NULL,
+    `next_fl` tinyint NOT NULL,
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT NULL,
     PRIMARY KEY (`id`),

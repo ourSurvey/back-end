@@ -79,6 +79,7 @@ public class SurveyServiceImpl implements SurveyService {
                         .essFl(question.getEssFl())
                         .dupFl(question.getDuplFl())
                         .randomShowFl(question.getRandomShowFl())
+                        .nextFl(question.getNextFl())
                         .oder(question.getOder())
                         .questionItemList(questionItemDetailDtoList)
                         .build();
@@ -182,6 +183,7 @@ public class SurveyServiceImpl implements SurveyService {
                         .duplFl(question.getDupFl())
                         .essFl(question.getEssFl())
                         .randomShowFl(question.getRandomShowFl())
+                        .nextFl(question.getNextFl())
                         .build());
 
                 List<QuestionItemDto.Create> questionItemList = question.getQuestionItemList();

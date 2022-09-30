@@ -240,6 +240,7 @@ public class SurveyController {
                     .essFl(question.getInt("essFl"))
                     .dupFl(question.getInt("dupFl"))
                     .randomShowFl(question.getInt("randomShowFl"))
+                    .nextFl(question.getInt("nextFl"))
                     .oder(question.getInt("oder"))
                     .questionItemList(getQuestionItemDtoList(question.getJSONArray("questionItems")))
                     .build());

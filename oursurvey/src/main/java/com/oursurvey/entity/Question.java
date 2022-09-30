@@ -44,8 +44,11 @@ public class Question extends CommonDate {
     @Column(name = "random_show_fl", columnDefinition = "TINYINT(3)", nullable = false)
     private Integer randomShowFl;
 
+    @Column(name = "next_fl", columnDefinition = "TINYINT(3)", nullable = false)
+    private Integer nextFl;
+
     @Builder
-    public Question(String id, Section section, String ask, String descrip, Integer oder, Integer multiFl, Integer duplFl, Integer essFl, Integer randomShowFl) {
+    public Question(String id, Section section, String ask, String descrip, Integer oder, Integer multiFl, Integer duplFl, Integer essFl, Integer randomShowFl, Integer nextFl) {
         this.id = id;
         this.section = section;
         this.ask = ask;
@@ -55,5 +58,6 @@ public class Question extends CommonDate {
         this.duplFl = duplFl;
         this.essFl = essFl;
         this.randomShowFl = randomShowFl;
+        this.nextFl = nextFl;
     }
 }

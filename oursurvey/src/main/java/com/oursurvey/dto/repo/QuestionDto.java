@@ -19,6 +19,7 @@ public class QuestionDto {
         private Integer essFl;
         private Integer dupFl;
         private Integer randomShowFl;
+        private Integer nextFl;
         private Integer oder;
         private List<QuestionItemDto.Create> questionItemList;
     }
@@ -36,6 +37,7 @@ public class QuestionDto {
         private Integer essFl;
         private Integer dupFl;
         private Integer randomShowFl;
+        private Integer nextFl;
         private Integer oder;
         private List<QuestionItemDto.Detail> questionItemList;
     }
