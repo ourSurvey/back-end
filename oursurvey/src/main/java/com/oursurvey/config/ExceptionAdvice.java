@@ -19,6 +19,8 @@ public class ExceptionAdvice {
             AuthFailException.class,
             PointLackException.class,
             DuplicateEmailException.class,
+            LoginIdException.class,
+            LoginPwdException.class,
             InvalidFormException.class,
             InvalidTokenException.class,
             InvalidAccessTokenException.class,
@@ -32,6 +34,8 @@ public class ExceptionAdvice {
     public MyResponse exceptionFor400(Exception e) {
         MyResponse myResponse = new MyResponse().setCode(MyResponse.CLIENT_ERROR).setMessage(e.getMessage());
         if (e instanceof DuplicateEmailException) myResponse.setCode(MyResponse.DUPLICATE_EMAIL);
+        if (e instanceof LoginIdException) myResponse.setCode(MyResponse.LOGIN_ID);
+        if (e instanceof LoginPwdException) myResponse.setCode(MyResponse.LOGIN_PWD);
         if (e instanceof PointLackException) myResponse.setCode(MyResponse.POINT_LACK);
         if (e instanceof InvalidTokenException) myResponse.setCode(MyResponse.INVALID_TOKEN);
         if (e instanceof InvalidAccessTokenException) myResponse.setCode(MyResponse.INVALID_ACCESSTOKEN);

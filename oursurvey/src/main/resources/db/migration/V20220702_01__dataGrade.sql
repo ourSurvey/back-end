@@ -1,1 +1,0 @@
-INSERT INTO `oursurvey`.`grade` (`pivot`, `name`) VALUES ('0', '1');

@@ -12,6 +12,8 @@ public class MyResponse {
     public static final Integer STATUS_GOOD = 200;             // 정상
     public static final Integer CLIENT_ERROR = 400;            // 클라이언트에러(invalid form ...)
     public static final Integer DUPLICATE_EMAIL = 401;         // 회원가입시 이메일 중복 에러
+    public static final Integer LOGIN_ID = 402;                // 로그인 시 이메일없음
+    public static final Integer LOGIN_PWD = 403;               // 로그인 시 비번오류
     public static final Integer NOT_FOUND = 404;               // 404
     public static final Integer POINT_LACK = 410;              // point 부족
     public static final Integer INVALID_SURVEY_PERIOD = 430;   // 서베이 기간 에러

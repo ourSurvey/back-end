@@ -65,12 +65,12 @@ public class AuthController {
 
         Optional<UserDto.Basic> opt = service.findByEmail(dto.getEmail());
         if (opt.isEmpty()) {
-            throw new AuthFailException("invalid id or pass");
+            throw new LoginIdException("invalid id");
         }
 
         UserDto.Basic user = opt.get();
         if (!encoder.matches(dto.getPwd(), user.getPwd())) {
-            throw new AuthFailException("invalid id or pass");
+            throw new LoginPwdException("invalid pwd");
         }
 
         TokenDto token = jwtUtil.createToken(user.getId());
