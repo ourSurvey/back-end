@@ -230,8 +230,8 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public Page<SurveyDto.Lizt> find(Pageable pageable) {
-        return repo.get(pageable);
+    public Page<SurveyDto.Lizt> find(Pageable pageable, String searchText) {
+        return repo.get(pageable, searchText);
     }
 
     @Override

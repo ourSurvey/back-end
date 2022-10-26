@@ -37,10 +37,10 @@ public class SurveyController {
     private final JwtUtil jwtUtil;
 
     @SchemaMapping(typeName = "Query", value = "getSurveyToPage")
-    public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size) {
+    public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size, @Argument String searchText) {
         MyResponse res = new MyResponse();
 
-        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size));
+        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size), searchText);
         lizts.map(SurveyDto.Lizt::convertHashtagListToList);
 
         HashMap<String, Object> dataMap = new HashMap<>();

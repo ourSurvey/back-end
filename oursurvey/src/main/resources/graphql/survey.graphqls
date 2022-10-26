@@ -30,5 +30,5 @@ type MyResponse {
 }
 
 type Query {
-    getSurveyToPage(page: Int!, size: Int!): MyResponse,
+    getSurveyToPage(page: Int!, size: Int!, searchText: String): MyResponse,
 }

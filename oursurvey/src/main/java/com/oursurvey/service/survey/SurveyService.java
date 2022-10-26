@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface SurveyService {
     String create(SurveyDto.Create dto);
     Optional<SurveyDto.Detail> findById(String id);
-    Page<SurveyDto.Lizt> find(Pageable pageable);
+    Page<SurveyDto.Lizt> find(Pageable pageable, String searchText);
     List<SurveyDto.MyList> findByUserId(Long userId);
     List<SurveyDto.MyListTemp> findTempByUserId(Long userId);
     void pull(Long userId, String surveyId);

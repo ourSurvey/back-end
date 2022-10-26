@@ -57,7 +57,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         for (String element : whiteList) {
-            if (element.startsWith(request.getMethod()) && element.split(":")[1].equals(requestUri)) {
+            if (element.startsWith(request.getMethod()) && requestUri.contains(element.split(":")[1])) {
                 return true;
             }
         }

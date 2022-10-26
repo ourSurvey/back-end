@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
     }
 
     @Override
-    public Page<SurveyDto.Lizt> get(Pageable pageable) {
+    public Page<SurveyDto.Lizt> get(Pageable pageable, String searchText) {
         JPAQuery<SurveyDto.Lizt> query = factory.select(
                         Projections.constructor(
                                 SurveyDto.Lizt.class,
@@ -61,6 +62,10 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
         JPAQuery<String> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
                 .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
                 .groupBy(survey.id);
+
+        if (StringUtils.hasText(searchText)) {
+            query.where(survey.subject.contains(searchText).or(hashtag.value.contains(searchText)));
+        }
 
         return PageableExecutionUtils.getPage(query.fetch(), pageable, () -> countQuery.fetch().size());
     }

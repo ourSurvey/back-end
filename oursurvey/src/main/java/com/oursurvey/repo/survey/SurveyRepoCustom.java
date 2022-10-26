@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface SurveyRepoCustom {
     Optional<Survey> getFromId(String id);
-    Page<SurveyDto.Lizt> get(Pageable pageable);
+    Page<SurveyDto.Lizt> get(Pageable pageable, String searchText);
     List<SurveyDto.MyList> getByUserId(Long userId);
     List<Survey> getTempByUserId(Long userId);
 }
