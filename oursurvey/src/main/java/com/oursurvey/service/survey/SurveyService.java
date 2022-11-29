@@ -11,6 +11,7 @@ public interface SurveyService {
     String create(SurveyDto.Create dto);
     Optional<SurveyDto.Detail> findById(String id);
     Page<SurveyDto.Lizt> find(Pageable pageable, String searchText);
+    Page<SurveyDto.Lizt> find(Pageable pageable, List<String> surveyIds);
     List<SurveyDto.MyList> findByUserId(Long userId);
     List<SurveyDto.MyListTemp> findTempByUserId(Long userId);
     void pull(Long userId, String surveyId);

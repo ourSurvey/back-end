@@ -235,6 +235,11 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
+    public Page<SurveyDto.Lizt> find(Pageable pageable, List<String> surveyIds) {
+        return repo.get(pageable, surveyIds);
+    }
+
+    @Override
     public List<SurveyDto.MyList> findByUserId(Long userId) {
         return repo.getByUserId(userId);
     }

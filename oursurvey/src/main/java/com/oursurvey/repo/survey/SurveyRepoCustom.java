@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface SurveyRepoCustom {
     Optional<Survey> getFromId(String id);
     Page<SurveyDto.Lizt> get(Pageable pageable, String searchText);
+    Page<SurveyDto.Lizt> get(Pageable pageable, List<String> surveyIds);
     List<SurveyDto.MyList> getByUserId(Long userId);
     List<Survey> getTempByUserId(Long userId);
 }

@@ -30,7 +30,9 @@ public class ReplyRepoImpl implements ReplyRepoCustom {
         return factory.select(
                         Projections.constructor(
                                 ReplyDto.MyList.class,
-                                reply.id
+                                reply.id,
+                                reply.survey.id,
+                                reply.createDt
                         )
                 ).from(reply).where(reply.user.id.eq(userId))
                 .fetch();

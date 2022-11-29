@@ -65,10 +65,46 @@ public class SurveyRepoImpl implements SurveyRepoCustom {
 
         if (StringUtils.hasText(searchText)) {
             query.where(survey.subject.contains(searchText).or(hashtag.value.contains(searchText)));
+            countQuery.where(survey.subject.contains(searchText).or(hashtag.value.contains(searchText)));
         }
 
         return PageableExecutionUtils.getPage(query.fetch(), pageable, () -> countQuery.fetch().size());
     }
+
+    @Override
+    public Page<SurveyDto.Lizt> get(Pageable pageable, List<String> surveyIds) {
+        JPAQuery<SurveyDto.Lizt> query = factory.select(
+                        Projections.constructor(
+                                SurveyDto.Lizt.class,
+                                survey.id,
+                                survey.subject,
+                                survey.content,
+                                survey.openFl,
+                                survey.minute,
+                                survey.startDate,
+                                survey.endDate,
+                                survey.createDt,
+                                ExpressionUtils.template(String.class, "GROUP_CONCAT({0})", hashtag.value)
+                        )
+                ).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
+                .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .groupBy(survey.id)
+                .orderBy(survey.pullDate.desc(), survey.createDt.desc());
+
+        JPAQuery<String> countQuery = factory.select(survey.id).from(survey).leftJoin(hashtagSurvey).on(survey.id.eq(hashtagSurvey.survey.id))
+                .leftJoin(hashtag).on(hashtagSurvey.hashtag.id.eq(hashtag.id))
+                .groupBy(survey.id);
+
+        if (surveyIds.size() > 0) {
+            query.where(survey.id.in(surveyIds));
+            countQuery.where(survey.id.in(surveyIds));
+        }
+
+        return PageableExecutionUtils.getPage(query.fetch(), pageable, () -> countQuery.fetch().size());
+    }
+
 
     @Override
     public List<SurveyDto.MyList> getByUserId(Long userId) {
