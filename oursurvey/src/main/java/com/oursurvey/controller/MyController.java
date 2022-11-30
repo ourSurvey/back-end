@@ -1,13 +1,12 @@
 package com.oursurvey.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
 import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.service.survey.SurveyService;
 import com.oursurvey.util.JwtUtil;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -83,46 +81,28 @@ public class MyController {
         List<String> surveyIds = replyList.stream().map(ReplyDto.MyList::getSurveyId).toList();
 
         // 참여한 설문
-        Page<SurveyDto.Lizt> surveyList = surveyService.find(PageRequest.of(page, size), surveyIds);
+        Page<SurveyDto.Lizt> surveyList = surveyService.find(PageRequest.of(page, size), "surveyIds", surveyIds);
 
         LocalDate now = LocalDate.now();
-        Page<MyReplyList> dataMap = surveyList.map(e -> {
-            MyReplyList obj = new MyReplyList();
-            obj.setSurveyId(e.getId());
-            obj.setSubject(e.getSubject());
-            obj.setStatus(now.isAfter(e.getEndDate()) ? 1 : 0);
-            obj.setOpenFl(e.getOpenFl());
-            obj.setStartDt(e.getStartDate());
-            obj.setEndDt(e.getEndDate());
+        Page<ReplyDto.MyReplyList> myReplyLists = surveyList.map(e -> {
+            ReplyDto.MyReplyList.MyReplyListBuilder builder = ReplyDto.MyReplyList.builder()
+                    .surveyId(e.getId())
+                    .subject(e.getSubject())
+                    .status(now.isAfter(e.getEndDate()) ? 1 : 0)
+                    .openFl(e.getOpenFl())
+                    .startDt(e.getStartDate())
+                    .endDt(e.getEndDate());
+
             replyList.forEach(r -> {
                 if (r.getSurveyId().equals(e.getId())) {
-                    obj.setReplyId(r.getId());
-                    obj.setReplyDate(r.getCreatedDt());
+                    builder.replyId(r.getId());
+                    builder.replyDate(r.getCreatedDt());
                 }
             });
-            return obj;
+
+            return builder.build();
         });
 
-        return res.setData(dataMap);
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
-    @Builder
-    public static class MyReplyList {
-        private String surveyId;
-        private Long replyId;
-        private String subject;
-        private Integer status;
-        private Integer openFl;
-        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
-        private LocalDate startDt;
-        @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
-        private LocalDate endDt;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
-        private LocalDateTime replyDate;
+        return res.setData(myReplyLists);
     }
 }

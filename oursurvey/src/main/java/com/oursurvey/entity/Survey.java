@@ -49,11 +49,14 @@ public class Survey extends CommonDate {
     @Column(name = "closing_comment")
     private String closingComment;
 
-    @Column(name = "pull_date", nullable = true)
+    @Column(name = "pull_date")
     private LocalDateTime pullDate;
 
+    @Column(name = "view_cnt", nullable = false)
+    private Integer viewCnt;
+
     @Builder
-    public Survey(String id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment, LocalDateTime pullDate) {
+    public Survey(String id, User user, String subject, String content, Integer minute, LocalDate startDate, LocalDate endDate, Integer openFl, Integer tempFl, String closingComment, LocalDateTime pullDate, Integer viewCnt) {
         this.id = id;
         this.user = user;
         this.subject = subject;
@@ -65,9 +68,14 @@ public class Survey extends CommonDate {
         this.tempFl = tempFl;
         this.closingComment = closingComment;
         this.pullDate = pullDate;
+        this.viewCnt = viewCnt;
     }
 
     public void pullUp() {
         this.pullDate = LocalDateTime.now();
+    }
+
+    public void addViewCnt() {
+        this.viewCnt++;
     }
 }

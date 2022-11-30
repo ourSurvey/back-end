@@ -40,7 +40,7 @@ public class SurveyController {
     public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size, @Argument String searchText) {
         MyResponse res = new MyResponse();
 
-        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size), searchText);
+        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size), "searchText", searchText);
         lizts.map(SurveyDto.Lizt::convertHashtagListToList);
 
         HashMap<String, Object> dataMap = new HashMap<>();

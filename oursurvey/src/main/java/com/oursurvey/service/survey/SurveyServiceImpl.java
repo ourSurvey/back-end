@@ -49,6 +49,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final UserRepo userRepo;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Optional<SurveyDto.Detail> findById(String id) {
         Optional<Survey> opt = repo.getFromId(id);
         if (opt.isEmpty()) {
@@ -56,6 +57,8 @@ public class SurveyServiceImpl implements SurveyService {
         }
 
         Survey survey = opt.get();
+        survey.addViewCnt();
+
         List<Section> sectionList = sectionRepo.getBySurveyId(survey.getId());
         List<SectionDto.Detail> sectionDetailDtoList = sectionList.stream().map(section -> {
             List<Question> questionList = questionRepo.getBySectionId(section.getId());
@@ -230,13 +233,8 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public Page<SurveyDto.Lizt> find(Pageable pageable, String searchText) {
-        return repo.get(pageable, searchText);
-    }
-
-    @Override
-    public Page<SurveyDto.Lizt> find(Pageable pageable, List<String> surveyIds) {
-        return repo.get(pageable, surveyIds);
+    public Page<SurveyDto.Lizt> find(Pageable pageable, String condition, Object obj) {
+        return repo.get(pageable, condition, obj);
     }
 
     @Override

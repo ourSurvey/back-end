@@ -105,6 +105,7 @@ CREATE TABLE IF NOT EXISTS `survey` (
     `temp_fl` tinyint NOT NULL,
     `closing_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
     `pull_date` datetime DEFAULT NULL,
+    `view_cnt` BIGINT(19) NULL DEFAULT '0',
     `created_dt` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_dt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
