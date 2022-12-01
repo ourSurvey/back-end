@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyErrorController implements ErrorController {
     @RequestMapping(value = "/error")
     public MyResponse error() {
-        return new MyResponse().setCode(MyResponse.NOT_FOUND).setMessage("not found");
+        return new MyResponse().setCode(MyResponse.NOT_FOUND).setMessage("not found or error");
     }
 }
