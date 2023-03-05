@@ -3,6 +3,7 @@ package com.oursurvey.entity;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @ToString(exclude = {"question"})
 @DynamicInsert
 @DynamicUpdate
-public class QuestionItem extends CommonDate {
+public class QuestionItem extends CommonDate implements Persistable<String> {
     public final static String NAME = "question_item";
 
     @Id
@@ -31,6 +32,11 @@ public class QuestionItem extends CommonDate {
 
     @Column(name = "next_section")
     private Long nextSection;
+
+    @Override
+    public boolean isNew() {
+        return createDt == null;
+    }
 
     @Builder
     public QuestionItem(String id, Question question, String content, Integer oder, Long nextSection) {

@@ -3,6 +3,7 @@ package com.oursurvey.entity;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @ToString(exclude = {"survey"})
 @DynamicInsert
 @DynamicUpdate
-public class Section extends CommonDate {
+public class Section extends CommonDate implements Persistable<String> {
     public final static String NAME = "section";
 
     @Id
@@ -31,6 +32,11 @@ public class Section extends CommonDate {
 
     @Column(name = "next_section", nullable = false)
     private Long nextSection=0L;
+
+    @Override
+    public boolean isNew() {
+        return createDt == null;
+    }
 
     @Builder
     public Section(String id, Survey survey, String title, String content, Long nextSection) {

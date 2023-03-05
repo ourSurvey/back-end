@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 @ToString
-public class CommonDate {
+public abstract class CommonDate {
     @CreatedDate
     @Column(name = "created_dt", updatable = false)
     LocalDateTime createDt;
