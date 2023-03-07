@@ -52,9 +52,9 @@ public class MyController {
 
         HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("tempCount", surveyService.findTempByUserId(userId).size());
-        dataMap.put("finCount", surveyData.stream().filter(e -> e.getStatus().equals(-1)).count());
+        dataMap.put("willCount", surveyData.stream().filter(e -> e.getStatus().equals(-1)).count());
         dataMap.put("ingCount", surveyData.stream().filter(e -> e.getStatus().equals(0)).count());
-        dataMap.put("willCount", surveyData.stream().filter(e -> e.getStatus().equals(1)).count());
+        dataMap.put("finCount", surveyData.stream().filter(e -> e.getStatus().equals(1)).count());
         dataMap.put("replyCount", replyService.findByUserId(userId).size());
         dataMap.put("list", status != null ? surveyData.stream().filter(e -> e.getStatus().equals(status)).toList() : surveyData);
         return res.setData(dataMap);
