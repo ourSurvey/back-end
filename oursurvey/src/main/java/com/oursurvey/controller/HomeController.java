@@ -1,5 +1,7 @@
 package com.oursurvey.controller;
 
+import com.oursurvey.config.resolver.IndexInfo;
+import com.oursurvey.config.resolver.IndexInfoAnno;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
@@ -34,12 +36,14 @@ public class HomeController {
     private final JwtUtil jwtUtil;
 
     @GetMapping
-    public MyResponse get(HttpServletRequest request, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+    public MyResponse get(@IndexInfoAnno IndexInfo index, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
         MyResponse res = new MyResponse();
 
         LocalDate now = LocalDate.now();
         HashMap<String, Object> dataMap = new HashMap<>();
-        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+        Long userId = index.getId();
+
+        log.info(" @@ HandlerMethodArgumentResolver test = {}", userId);
 
         List<SurveyDto.MyList> mySurvey = surveyService.findByUserId(userId);
         mySurvey.forEach(e -> {

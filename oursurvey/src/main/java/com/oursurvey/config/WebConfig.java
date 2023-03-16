@@ -1,7 +1,9 @@
 package com.oursurvey.config;
 
 import com.oursurvey.config.interceptor.AuthInterceptor;
+import com.oursurvey.config.resolver.IndexInfoResolver;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +22,10 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+    private final IndexInfoResolver indexInfoResolver;
+
     @Bean
     @Primary
     PasswordEncoder getBCryptEncoder() {
@@ -88,15 +93,17 @@ public class WebConfig implements WebMvcConfigurer {
                 );
     }
 
-    // @Override
-    // public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-    //     SortHandlerMethodArgumentResolver sortArgumentResolver = new SortHandlerMethodArgumentResolver();
-    //     sortArgumentResolver.setSortParameter("sortBy");
-    //     sortArgumentResolver.setPropertyDelimiter("-");
-    //     PageableHandlerMethodArgumentResolver pageableArgumentResolver = new PageableHandlerMethodArgumentResolver(sortArgumentResolver);
-    //     pageableArgumentResolver.setOneIndexedParameters(true);
-    //     pageableArgumentResolver.setMaxPageSize(20);
-    //     pageableArgumentResolver.setFallbackPageable(PageRequest.of(0,10));
-    //     resolvers.add(pageableArgumentResolver);
-    // }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        // SortHandlerMethodArgumentResolver sortArgumentResolver = new SortHandlerMethodArgumentResolver();
+        // sortArgumentResolver.setSortParameter("sortBy");
+        // sortArgumentResolver.setPropertyDelimiter("-");
+        // PageableHandlerMethodArgumentResolver pageableArgumentResolver = new PageableHandlerMethodArgumentResolver(sortArgumentResolver);
+        // pageableArgumentResolver.setOneIndexedParameters(true);
+        // pageableArgumentResolver.setMaxPageSize(20);
+        // pageableArgumentResolver.setFallbackPageable(PageRequest.of(0,10));
+        // resolvers.add(pageableArgumentResolver);
+        resolvers.add(indexInfoResolver);
+    }
 }
