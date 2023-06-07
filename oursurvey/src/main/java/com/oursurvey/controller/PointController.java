@@ -22,8 +22,9 @@ public class PointController {
 
     @GetMapping
     public MyResponse get(HttpServletRequest request) {
-        MyResponse res = new MyResponse();
         Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
-        return res.setData(service.findSumByUserId(id));
+        Integer sum = service.findSumByUserId(id);
+
+        return new MyResponse().setData(sum);
     }
 }

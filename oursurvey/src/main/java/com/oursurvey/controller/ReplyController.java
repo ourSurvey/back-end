@@ -40,7 +40,9 @@ public class ReplyController {
     public MyResponse get(@PathVariable Long id) {
         MyResponse res = new MyResponse();
         List<AnswerDto.Base> answerList = answerService.findByReplyId(id);
-        return res.setData(answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse)));
+        Map<String, String> collect = answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse));
+
+        return res.setData(collect);
     }
 
     // NOTE. [point ++, experience ++]

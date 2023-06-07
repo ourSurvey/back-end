@@ -15,7 +15,7 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtUtil {
-    @Value("${jwt.key}")
+    @Value("${custom.jwt.key}")
     private String jwtKey;
     private static final int ACCESS_TOKEN_PERIOD = 60 * 60 * 3; // 3 hour
 

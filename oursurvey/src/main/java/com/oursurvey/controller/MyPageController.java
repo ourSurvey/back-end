@@ -1,5 +1,6 @@
 package com.oursurvey.controller;
 
+import com.oursurvey.dto.MyPageDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
@@ -25,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/my")
 @RequiredArgsConstructor
-public class MyController {
+public class MyPageController {
     private final SurveyService surveyService;
     private final ReplyService replyService;
 
@@ -33,13 +34,10 @@ public class MyController {
 
     @GetMapping("/survey")
     public MyResponse survey(HttpServletRequest request, @RequestParam(required = false) Integer status) {
-        MyResponse res = new MyResponse();
-
         Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
 
         LocalDate now = LocalDate.now();
         List<SurveyDto.MyList> surveyData = surveyService.findByUserId(userId);
-
         surveyData.forEach(e -> {
             if (now.isBefore(e.getStartDate())) {
                 e.setStatus(-1);
@@ -50,31 +48,37 @@ public class MyController {
             }
         });
 
-        HashMap<String, Object> dataMap = new HashMap<>();
-        dataMap.put("tempCount", surveyService.findTempByUserId(userId).size());
-        dataMap.put("willCount", surveyData.stream().filter(e -> e.getStatus().equals(-1)).count());
-        dataMap.put("ingCount", surveyData.stream().filter(e -> e.getStatus().equals(0)).count());
-        dataMap.put("finCount", surveyData.stream().filter(e -> e.getStatus().equals(1)).count());
-        dataMap.put("replyCount", replyService.findByUserId(userId).size());
-        dataMap.put("list", status != null ? surveyData.stream().filter(e -> e.getStatus().equals(status)).toList() : surveyData);
-        return res.setData(dataMap);
+        int tempSurveyCount = surveyService.findTempByUserId(userId).size();
+        int replyCount = replyService.findByUserId(userId).size();
+
+        MyPageDto.SurveyResponse responseData = MyPageDto.SurveyResponse.builder()
+                .tempCount(tempSurveyCount)
+                .replyCount(replyCount)
+                .willCount(surveyData.stream().filter(e -> e.getStatus().equals(-1)).count())
+                .ingCount(surveyData.stream().filter(e -> e.getStatus().equals(0)).count())
+                .finCount(surveyData.stream().filter(e -> e.getStatus().equals(1)).count())
+                .list(status != null ? surveyData.stream().filter(e -> e.getStatus().equals(status)).toList() : surveyData)
+                .build();
+
+        return new MyResponse().setData(responseData);
     }
 
     @GetMapping("/survey/temp")
     public MyResponse surveyTemp(HttpServletRequest request) {
-        MyResponse res = new MyResponse();
-        HashMap<String, Object> dataMap = new HashMap<>();
+        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+        List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(userId);
 
-        List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)));
-        dataMap.put("tempList", tempList);
-        dataMap.put("tempCount", tempList.size());
-        return res.setData(dataMap);
+        MyPageDto.SurveyTempResponse responseData = MyPageDto.SurveyTempResponse.builder()
+                .tempList(tempList)
+                .tempCount(tempList.size())
+                .build();
+
+        return new MyResponse().setData(responseData);
     }
 
 
     @GetMapping("/reply")
     public MyResponse reply(HttpServletRequest request, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
-        MyResponse res = new MyResponse();
         Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
 
         List<ReplyDto.MyList> replyList = replyService.findByUserId(userId);
@@ -103,6 +107,6 @@ public class MyController {
             return builder.build();
         });
 
-        return res.setData(myReplyLists);
+        return new MyResponse().setData(myReplyLists);
     }
 }

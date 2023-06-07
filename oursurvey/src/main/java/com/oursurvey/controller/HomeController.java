@@ -2,6 +2,7 @@ package com.oursurvey.controller;
 
 import com.oursurvey.config.resolver.IndexInfo;
 import com.oursurvey.config.resolver.IndexInfoAnno;
+import com.oursurvey.dto.HomeDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
@@ -29,21 +30,13 @@ import java.util.List;
 @RequestMapping("/api/home")
 @RequiredArgsConstructor
 public class HomeController {
-    private final ReplyService replyService;
     private final SurveyService surveyService;
     private final PointService pointService;
 
-    private final JwtUtil jwtUtil;
-
     @GetMapping
     public MyResponse get(@IndexInfoAnno IndexInfo index, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
-        MyResponse res = new MyResponse();
-
         LocalDate now = LocalDate.now();
-        HashMap<String, Object> dataMap = new HashMap<>();
         Long userId = index.getId();
-
-        log.info(" @@ HandlerMethodArgumentResolver test = {}", userId);
 
         List<SurveyDto.MyList> mySurvey = surveyService.findByUserId(userId);
         mySurvey.forEach(e -> {
@@ -56,27 +49,20 @@ public class HomeController {
             }
         });
 
-        // NOTE. 3개 이상일 때 기획!
-        dataMap.put("mySurvey", (mySurvey.size() > 3) ? mySurvey.subList(0, 3) : mySurvey);
-        dataMap.put("mySurveyCount", mySurvey.size());
-
-        // NOTE. 내 합산 포인트
         Integer myPoint = pointService.findSumByUserId(userId);
-        dataMap.put("myPoint", myPoint);
-
-        // NOTE. 5분이하 설문들
         Page<SurveyDto.Lizt> minute = surveyService.find(PageRequest.of(0, 25), "minute", 5);
-        dataMap.put("fiveMinuteSurvey", minute.getContent());
-
-        // NOTE. 진행중 + 공개
         Page<SurveyDto.Lizt> openFl = surveyService.find(PageRequest.of(0, 25), "openFl", 1);
-        dataMap.put("openSurvey", openFl.getContent());
-
-        // NOTE. 진행중 + 조회수 많은 순
         Page<SurveyDto.Lizt> viewCnt = surveyService.find(PageRequest.of(0, 25), "viewCnt", null);
-        dataMap.put("popularSurvey", openFl.getContent());
 
+        HomeDto.Response responseData = HomeDto.Response.builder()
+                .mySurvey((mySurvey.size() > 3) ? mySurvey.subList(0, 3) : mySurvey)
+                .mySurveyCount(mySurvey.size())
+                .myPoint(myPoint)
+                .fiveMinuteSurvey(minute.getContent())
+                .openSurvey(openFl.getContent())
+                .popularSurvey(viewCnt.getContent())
+                .build();
 
-        return res.setData(dataMap);
+        return new MyResponse().setData(responseData);
     }
 }

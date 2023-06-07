@@ -24,15 +24,13 @@ import java.util.UUID;
 @RequestMapping("/api/file")
 public class FileController {
     private final FileService fileService;
-    private final AwsS3Util awsS3Util;
     private final JwtUtil jwtUtil;
 
     @PostMapping
     public MyResponse post(HttpServletRequest request, MultipartFile file) {
-        MyResponse res = new MyResponse();
-        if (!awsS3Util.checkFile(file)) {
-            throw new S3FileUploadException("invalid file");
-        }
+        // if (!awsS3Util.checkFile(file)) {
+        //     throw new S3FileUploadException("invalid file");
+        // }
 
         Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
         String oName = file.getOriginalFilename();
@@ -46,26 +44,22 @@ public class FileController {
                 .file(file)
                 .build());
 
-        return res.setData(fileResult);
+        return new MyResponse().setData(fileResult);
     }
 
     @DeleteMapping("/{id}")
     public MyResponse delete(HttpServletRequest request, @PathVariable Long id) {
-        MyResponse res = new MyResponse();
-
         Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-        Optional<FileDto.Base> opt = fileService.findById(id);
-        if (opt.isEmpty()) {
+        FileDto.Base fileDto = fileService.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("no file");
-        }
+        });
 
-        FileDto.Base fileDto = opt.get();
         if (!fileDto.getUserId().equals(userId)) {
             throw new AuthFailException("its not your file");
         }
 
         fileService.delete(id);
-        return res;
+        return new MyResponse();
     }
 }

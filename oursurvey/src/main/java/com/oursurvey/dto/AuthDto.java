@@ -69,4 +69,39 @@ public class AuthDto {
         @NotBlank
         private String pwd;
     }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class LoginReponse {
+        private String tokenType;
+        private String access;
+        private String refresh;
+        private Integer refreshExpire;
+        private Integer sumPoint;
+        private Integer savedPoint;
+
+        public void setSavedPoint(Integer point) {
+            this.savedPoint = point;
+        }
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class JoinResponse {
+        private String tokenType;
+        private String access;
+        private Integer savedPoint;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class FindPasswordResponse {
+        private String token;
+    }
 }

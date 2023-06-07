@@ -34,7 +34,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     RedisTemplate<String, Object> redis;
 
-    @Value("${spring.redis.prefix.key}")
+    @Value("${custom.redis.prefix.key}")
     private String REDIS_PREFIX_KEY;
 
     private final String REFRESH_TOKEN_URI = "/api/auth/refresh";

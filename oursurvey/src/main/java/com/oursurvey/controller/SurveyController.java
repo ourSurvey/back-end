@@ -55,12 +55,11 @@ public class SurveyController {
     @GetMapping("/{id}")
     public MyResponse get(@PathVariable String id) {
         MyResponse res = new MyResponse();
-        Optional<SurveyDto.Detail> opt = surveyService.findById(id);
-        if (opt.isEmpty()) {
+        SurveyDto.Detail survey = surveyService.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
-        }
+        });
 
-        return res.setData(opt.get());
+        return res.setData(survey);
     }
 
     @GetMapping("/tempCheck")
@@ -95,12 +94,11 @@ public class SurveyController {
         MyResponse res = new MyResponse();
 
         HashMap<String, Object> dataMap = new HashMap<>();
-        Optional<SurveyDto.Detail> opt = surveyService.findById(surveyId);
-        if (opt.isEmpty()) {
+        SurveyDto.Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
-        }
-        dataMap.put("survey", opt.get());
+        });
 
+        dataMap.put("survey", surveyDetail);
         List<Long> replyIdList = replyService.findIdBySurveyId(surveyId);
         dataMap.put("replyIdList", replyIdList);
 
@@ -119,15 +117,14 @@ public class SurveyController {
         MyResponse res = new MyResponse();
 
         HashMap<String, Object> dataMap = new HashMap<>();
-        Optional<SurveyDto.Detail> opt = surveyService.findById(surveyId);
-        if (opt.isEmpty()) {
+        SurveyDto.Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
-        }
-        dataMap.put("survey", opt.get());
+        });
 
+
+        dataMap.put("survey", surveyDetail);
         ArrayList<QuestionDto.Summary> summaryList = new ArrayList<>();
 
-        SurveyDto.Detail surveyDetail = opt.get();
         List<SectionDto.Detail> sectionList = surveyDetail.getSectionList();
         sectionList.forEach(section -> {
             section.getQuestionList().forEach(question -> {

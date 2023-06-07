@@ -10,7 +10,7 @@ import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Point;
 import com.oursurvey.exception.*;
-import com.oursurvey.service.TransactionService;
+import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.loggedin.LoggedInService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.user.UserService;
@@ -43,44 +43,44 @@ public class AuthController {
     private final UserService service;
     private final PointService pointService;
     private final LoggedInService logService;
-    private final TransactionService tService;
+    private final ExperienceService experienceService;
 
     private final PasswordEncoder encoder;
     private final RedisTemplate<String, Object> redis;
     private final JwtUtil jwtUtil;
     private final MailUtil mailUtil;
 
-    @Value("${spring.redis.prefix.key}")
+    @Value("${custom.redis.prefix.key}")
     private String REDIS_PREFIX_KEY;
-    @Value("${spring.mail.prefix.key}")
+    @Value("${custom.mail.prefix.key}")
     private String MAIL_PREFIX_KEY;
 
     // NOTE. [point ++, experience ++]
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
-        MyResponse res = new MyResponse();
         if (br.hasFieldErrors()) {
             throw new InvalidFormException("invalid form");
         }
 
-        Optional<UserDto.Basic> opt = service.findByEmail(dto.getEmail());
-        if (opt.isEmpty()) {
+        UserDto.Basic user = service.findByEmail(dto.getEmail()).orElseThrow(() -> {
             throw new LoginIdException("invalid id");
-        }
+        });
 
-        UserDto.Basic user = opt.get();
         if (!encoder.matches(dto.getPwd(), user.getPwd())) {
             throw new LoginPwdException("invalid pwd");
         }
 
         TokenDto token = jwtUtil.createToken(user.getId());
-        HashMap<String, Object> dataMap = new HashMap<>();
-        dataMap.put("tokenType", "Bearer");
-        dataMap.put("access", token.getAccessToken());
-        dataMap.put("refresh", token.getRefreshToken());
-        dataMap.put("refreshExpire", token.getRefreshTokenExpire());
-        dataMap.put("sumPoint", pointService.findSumByUserId(user.getId()));
-        dataMap.put("savedPoint", null);
+
+        Integer sumPoint = pointService.findSumByUserId(user.getId());
+        AuthDto.LoginReponse responseData = AuthDto.LoginReponse.builder()
+                .tokenType("Bearer")
+                .access(token.getAccessToken())
+                .refresh(token.getRefreshToken())
+                .refreshExpire(token.getRefreshTokenExpire())
+                .sumPoint(sumPoint)
+                .savedPoint(0)
+                .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
@@ -89,41 +89,38 @@ public class AuthController {
         // log & point & experience
         Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         if (logOpt.isEmpty()) {
-            tService.saveLogAndPointAndExperience(
-                    LoggedInDto.Create.builder().userId(user.getId()).remoteAddr(request.getRemoteAddr()).build(),
-                    PointDto.Create.builder()
+            logService.create(LoggedInDto.Create.builder()
+                    .userId(user.getId())
+                    .remoteAddr(request.getRemoteAddr())
+                    .build());
+
+            pointService.create(PointDto.Create.builder()
                     .userId(user.getId())
                     .value(Point.LOGIN_VALUE)
                     .reason(Point.LOGIN_REASON)
                     .tablePk(user.getId())
                     .tableName("user")
-                    .build(),
-                    ExperienceDto.Create.builder()
+                    .build());
+
+            experienceService.create(ExperienceDto.Create.builder()
                     .userId(user.getId())
                     .value(Experience.LOGIN_VALUE)
                     .reason(Experience.LOGIN_REASON)
                     .tablePk(user.getId())
                     .tableName("user")
                     .build());
-
-            dataMap.replace("savedPoint", Point.LOGIN_VALUE);
+            responseData.setSavedPoint(Point.LOGIN_VALUE);
         }
 
-        return res.setData(dataMap);
+        return new MyResponse().setData(responseData);
     }
 
     // NOTE. [point ++]
     @PostMapping("/join")
-    public MyResponse join(@Validated @RequestBody AuthDto.Join dto, BindingResult br) {
-        MyResponse res = new MyResponse();
-        if (br.hasFieldErrors()) {
-            throw new InvalidFormException("invalid form");
-        }
-
-        Optional<UserDto.Basic> existMail = service.findByEmail(dto.getEmail());
-        if (existMail.isPresent()) {
+    public MyResponse join(@RequestBody AuthDto.Join dto) {
+        service.findByEmail(dto.getEmail()).ifPresent(e -> {
             throw new DuplicateEmailException("duplicate email");
-        }
+        });
 
         Long joinUser = service.create(UserDto.Create.builder()
                 .email(dto.getEmail())
@@ -132,44 +129,40 @@ public class AuthController {
                 .build());
 
         TokenDto token = jwtUtil.createToken(joinUser, true);
-        HashMap<String, Object> dataMap = new HashMap<>();
-        dataMap.put("tokenType", "Bearer");
-        dataMap.put("access", token.getAccessToken());
-        dataMap.put("savedPoint", Point.JOIN_VALUE);
+        AuthDto.JoinResponse responseData = AuthDto.JoinResponse.builder()
+                .tokenType("Bearer")
+                .access(token.getAccessToken())
+                .savedPoint(Point.JOIN_VALUE)
+                .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
         vop.set(REDIS_PREFIX_KEY + joinUser, token.getAccessToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
-        return res.setData(dataMap);
+        return new MyResponse().setData(responseData);
     }
 
     @PostMapping("/addition")
     public MyResponse addition(HttpServletRequest request, @RequestBody AuthDto.Addition dto) {
-        MyResponse res = new MyResponse();
-
         Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
         service.updateAddition(id, UserDto.UpdateAddition.builder().gender(dto.getGender()).age(dto.getAge()).tel(dto.getTel()).build());
-        return res;
+        return new MyResponse();
     }
 
     // 인증번호 발송
     @PostMapping("/take")
     public MyResponse take(@RequestBody HashMap<String, String> map) throws Exception {
-        MyResponse res = new MyResponse();
         String email = map.get("email");
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
         ValueOperations<String, Object> vop = redis.opsForValue();
-        System.out.println("ddd = " + (String) vop.get("ddd"));
         vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
-        return res;
+        return new MyResponse();
     }
 
     // 인증번호 확인
     @PostMapping("/certified")
     public MyResponse certified(@RequestBody AuthDto.Certified dto) throws Exception {
-        MyResponse res = new MyResponse();
         ValueOperations<String, Object> vop = redis.opsForValue();
         String code = String.valueOf(vop.get(MAIL_PREFIX_KEY + dto.getEmail()));
         if (code == null) {
@@ -180,14 +173,12 @@ public class AuthController {
             throw new CertifiedException("not matched code");
         }
 
-        return res;
+        return new MyResponse();
     }
 
     // 인증번호 발송
     @PostMapping("/findpwd")
     public MyResponse findpwd(@RequestBody HashMap<String, String> map) throws Exception {
-        MyResponse res = new MyResponse();
-
         String email = map.get("email");
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
@@ -195,15 +186,15 @@ public class AuthController {
         ValueOperations<String, Object> vop = redis.opsForValue();
         vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
 
-        HashMap<String, String> dataMap = new HashMap<>();
-        dataMap.put("token", jwtUtil.createToken(email, 300));
-        return res.setData(dataMap);
+        AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
+                .token(jwtUtil.createToken(email, 300))
+                .build();
+
+        return new MyResponse().setData(responseData);
     }
 
     @PostMapping("/resetpwd")
     public MyResponse resetpwd(@RequestBody AuthDto.Resetpwd dto) throws Exception {
-        MyResponse res = new MyResponse();
-
         if (!jwtUtil.validateToken(dto.getToken(), true)) {
             throw new AuthFailException("invalid token");
         }
@@ -212,12 +203,11 @@ public class AuthController {
         String email = claims.get("string", String.class);
 
         service.updatePwd(email, encoder.encode(dto.getPwd()));
-        return res;
+        return new MyResponse();
     }
 
     @GetMapping("/logout")
     public MyResponse logout(HttpServletRequest request) {
-        MyResponse res = new MyResponse();
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
             throw new InvalidTokenException();
@@ -244,14 +234,12 @@ public class AuthController {
 
         request.getSession().invalidate();
         vop.set(REDIS_PREFIX_KEY + id, token, 1, TimeUnit.MILLISECONDS);
-        return res;
+        return new MyResponse();
     }
 
     // access token 리프레시
     @GetMapping("/refresh")
     public MyResponse refresh(HttpServletRequest request) throws Exception {
-        MyResponse res = new MyResponse();
-
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
             throw new InvalidTokenException();
@@ -274,7 +262,7 @@ public class AuthController {
         HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("tokenType", "Bearer");
         dataMap.put("access", token.getAccessToken());
-        return res.setData(dataMap);
+        return new MyResponse().setData(dataMap);
     }
 
     @GetMapping("/validate")

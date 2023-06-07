@@ -1,6 +1,7 @@
 package com.oursurvey.service.experience;
 
 import com.oursurvey.dto.repo.ExperienceDto;
+import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Grade;
 import com.oursurvey.entity.User;
 import com.oursurvey.repo.experience.ExperienceRepo;
@@ -22,6 +23,17 @@ public class ExperienceServiceImpl implements ExperienceService {
     private final ExperienceRepo repo;
     private final UserRepo userRepo;
     private final GradeRepo gradeRepo;
+
+    @Override
+    public Long create(ExperienceDto.Create dto) {
+        return repo.save(Experience.builder()
+                .user(User.builder().id(dto.getUserId()).build())
+                .value(dto.getValue())
+                .reason(dto.getReason())
+                .tablePk(dto.getTablePk().toString())
+                .tableName(dto.getTableName())
+                .build()).getId();
+    }
 
     @Override
     @Transactional

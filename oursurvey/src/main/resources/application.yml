@@ -1,0 +1,59 @@
+spring:
+  profiles:
+    active: local
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: none
+    open-in-view: false
+    generate-ddl: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  datasource:
+    url: ENC(OyFRGw1m86ob8mmLZnTqycXPKZbZbKcPCyjIU6/I6X0/1ljzU2TaJlwVCO7eRm/7xYfwCcIEaiHdpsNgY4YcIC4FjCwbdIpCfHuDX/nEGiaEHk+rQd6KkHdJnh5Aqf1dM1/D7dzdZIp8WWXLLWlthGIP1J24me60oRT19rpUicWiFbonbGf5rY/V5Zn1oqz6W0wsmT+aQ3nCrIJnXm/IFlqsE9WBL6ZOZbVd5J6zhE0=)
+    username: ENC(3peVfBHUYvOf+N3R98kD2Q==)
+    password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)
+    driver-class-name: org.mariadb.jdbc.Driver
+  data:
+    redis:
+      repositories:
+        enabled: false
+  redis:
+    lettuce:
+      pool:
+        enabled: true
+    port: 6379
+    password: ENC(eX4FMuMGP/qzSa25iQYvSg==)
+    host: localhost
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: ENC(78lkX6YxSQshdebTLuJz8lmd7cA/uPZf+jiFbCeaPqM=)
+    password: ENC(RRMMcBtgo6ITLj6OVctibbfd4Z+/sOOsnm+W3JXrTrw=)
+jasypt:
+  encryptor:
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    property:
+      prefix: ENC(
+      suffix: )
+    algorithm: PBEWithMD5AndDES
+    password:
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true
+custom:
+  jwt.key: ENC(r8jJCvzs/Rpq6kZ8dyE7hbiXk/bpq80frxX/AW4tlCAtGi3YUJ7I1l7tG21aYMa42ZcL6sYSiQ1pJfw4V0RbcspB+4s4OF6q1RWuiO6chx4=)
+  redis.prefix.key: ENC(r8ZSfM6EqGGg1CCHxB2zROl2dpo9csyn)
+  mail.prefix.key: ENC(cEoUDAnUldZJfqK6MW2Nj3UidffO2rBWumPSmbQc5t4=)

@@ -71,14 +71,6 @@ public class WebConfig implements WebMvcConfigurer {
         return new AuthInterceptor();
     }
 
-    @Bean
-    public FlywayMigrationStrategy cleanMigrateStrategy() {
-        return flyway -> {
-            flyway.repair();
-            flyway.migrate();
-        };
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
