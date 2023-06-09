@@ -6,7 +6,7 @@ import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
 import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.service.survey.SurveyService;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 
 @Slf4j

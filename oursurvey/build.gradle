@@ -67,11 +67,11 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.querydsl/querydsl-sql
 	implementation 'com.querydsl:querydsl-sql:5.0.0'
 
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-quartz
-	implementation 'org.springframework.boot:spring-boot-starter-quartz:2.7.3'
-
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.graphql:spring-graphql-test'
 	testImplementation 'org.springframework:spring-webflux'

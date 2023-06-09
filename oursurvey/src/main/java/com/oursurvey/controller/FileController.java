@@ -4,10 +4,8 @@ import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.FileDto;
 import com.oursurvey.exception.AuthFailException;
 import com.oursurvey.exception.ObjectNotFoundException;
-import com.oursurvey.exception.S3FileUploadException;
 import com.oursurvey.service.file.FileService;
-import com.oursurvey.util.AwsS3Util;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j

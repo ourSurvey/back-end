@@ -1,4 +1,4 @@
-package com.oursurvey.util;
+package com.oursurvey.jwt;
 
 import com.oursurvey.dto.TokenDto;
 import com.oursurvey.exception.AuthFailException;
@@ -8,21 +8,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Slf4j
 @Component
+@Deprecated
 public class JwtUtil {
     @Value("${custom.jwt.key}")
     private String jwtKey;
+    private Key key;
     private static final int ACCESS_TOKEN_PERIOD = 60 * 60 * 3; // 3 hour
 
     public static final int REFRESH_TOKEN_PERIOD = 60 * 60 * 24 * 7; // 7 days
 
-    private Key getKey() {
-        return Keys.hmacShaKeyFor(this.jwtKey.getBytes(StandardCharsets.UTF_8));
+    @PostConstruct
+    private void createKey() {
+        this.key = Keys.hmacShaKeyFor(this.jwtKey.getBytes(StandardCharsets.UTF_8));
     }
 
     public TokenDto createToken(Long id, Boolean onlyAccess) {
@@ -34,7 +38,7 @@ public class JwtUtil {
                 .claim("id", id)
                 .claim("tokenType", "access")
                 .setExpiration(new Date(System.currentTimeMillis() + (REFRESH_TOKEN_PERIOD * 1000)))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact());
 
         if (!onlyAccess) {
@@ -43,7 +47,7 @@ public class JwtUtil {
                     .claim("id", id)
                     .claim("tokenType", "refresh")
                     .setExpiration(new Date(System.currentTimeMillis() + (REFRESH_TOKEN_PERIOD * 1000)))
-                    .signWith(getKey(), SignatureAlgorithm.HS256)
+                    .signWith(key, SignatureAlgorithm.HS256)
                     .compact());
 
             tokenDto.setRefreshTokenExpire(REFRESH_TOKEN_PERIOD);
@@ -61,7 +65,7 @@ public class JwtUtil {
         return Jwts.builder().setSubject("stringToken")
                 .claim("string", str)
                 .setExpiration(new Date(time + (sec * 1000)))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -69,7 +73,7 @@ public class JwtUtil {
     public Boolean validateToken(String header, Boolean justString) {
         String token = justString ? header : this.extractToken(header);
         try {
-            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             // log.info("잘못된 JWT 서명입니다.");
@@ -89,15 +93,15 @@ public class JwtUtil {
     }
 
     public Claims parseToken(String header) {
-        return Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(this.extractToken(header)).getBody();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(this.extractToken(header)).getBody();
     }
 
     public Claims parseTokenString(String string) {
-        return Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(string).getBody();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(string).getBody();
     }
 
     public Long getLoginUserId(String header) {
-        Claims body = Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(this.extractToken(header)).getBody();
+        Claims body = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(this.extractToken(header)).getBody();
         return body.get("id", Long.class);
     }
 

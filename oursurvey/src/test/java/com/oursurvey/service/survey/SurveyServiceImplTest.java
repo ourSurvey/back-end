@@ -1,15 +1,15 @@
 package com.oursurvey.service.survey;
 
-import com.oursurvey.dto.repo.*;
+import com.oursurvey.dto.repo.AnswerDto;
+import com.oursurvey.dto.repo.QuestionDto;
+import com.oursurvey.dto.repo.SectionDto;
+import com.oursurvey.dto.repo.SurveyDto;
 import com.oursurvey.repo.hashtagsurvey.HashtagSurveyRepo;
 import com.oursurvey.service.answer.AnswerService;
-import com.oursurvey.util.JsonUtil;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
@@ -23,8 +23,6 @@ class SurveyServiceImplTest {
     HashtagSurveyRepo repo;
     @Autowired
     AnswerService answerService;
-    @Autowired
-    JsonUtil jsonUtil;
 
     @Test
     void test1111() {

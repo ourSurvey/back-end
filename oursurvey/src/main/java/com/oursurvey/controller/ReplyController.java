@@ -2,19 +2,17 @@ package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.AnswerDto;
-import com.oursurvey.dto.repo.PointDto;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.Point;
 import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.parameters.P;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 

@@ -4,12 +4,11 @@ import com.oursurvey.exception.AuthFailException;
 import com.oursurvey.exception.InvalidAccessTokenException;
 import com.oursurvey.exception.InvalidRefreshTokenException;
 import com.oursurvey.exception.InvalidTokenException;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
@@ -20,14 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
+@Deprecated
 public class AuthInterceptor implements HandlerInterceptor {
-
-    @Autowired
-    private Environment env;
-
     @Autowired
     private JwtUtil jwtUtil;
 

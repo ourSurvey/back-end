@@ -10,19 +10,26 @@ import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Point;
 import com.oursurvey.exception.*;
+import com.oursurvey.jwt.TokenProvider;
+import com.oursurvey.jwt.TokenType;
 import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.loggedin.LoggedInService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.user.UserService;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import com.oursurvey.util.MailUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.hql.internal.ast.util.TokenPrinters;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -48,6 +55,8 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final RedisTemplate<String, Object> redis;
     private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MailUtil mailUtil;
 
     @Value("${custom.redis.prefix.key}")
@@ -55,13 +64,9 @@ public class AuthController {
     @Value("${custom.mail.prefix.key}")
     private String MAIL_PREFIX_KEY;
 
-    // NOTE. [point ++, experience ++]
-    @PostMapping("/login")
-    public MyResponse login(HttpServletRequest request, @Validated @RequestBody AuthDto.Login dto, BindingResult br) throws Exception {
-        if (br.hasFieldErrors()) {
-            throw new InvalidFormException("invalid form");
-        }
 
+    @PostMapping("/login")
+    public MyResponse login(HttpServletRequest request, @RequestBody AuthDto.Login dto) throws Exception {
         UserDto.Basic user = service.findByEmail(dto.getEmail()).orElseThrow(() -> {
             throw new LoginIdException("invalid id");
         });
@@ -70,21 +75,23 @@ public class AuthController {
             throw new LoginPwdException("invalid pwd");
         }
 
-        TokenDto token = jwtUtil.createToken(user.getId());
+        TokenType refreshTokenType = TokenType.REFRESH_TOKEN;
+        String accessToken = tokenProvider.createToken(createAuthentication(user.getId(), dto.getPwd()), TokenType.ACCESS_TOKEN);
+        String refreshToken = tokenProvider.createToken(createAuthentication(user.getId(), dto.getPwd()), refreshTokenType);
 
         Integer sumPoint = pointService.findSumByUserId(user.getId());
         AuthDto.LoginReponse responseData = AuthDto.LoginReponse.builder()
                 .tokenType("Bearer")
-                .access(token.getAccessToken())
-                .refresh(token.getRefreshToken())
-                .refreshExpire(token.getRefreshTokenExpire())
+                .access(accessToken)
+                .refresh(refreshToken)
+                .refreshExpire(refreshTokenType.getHours())
                 .sumPoint(sumPoint)
                 .savedPoint(0)
                 .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + user.getId(), token.getRefreshToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
+        vop.set(REDIS_PREFIX_KEY + user.getId(), refreshToken, refreshTokenType.getHours(), TimeUnit.HOURS);
 
         // log & point & experience
         Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
@@ -115,7 +122,6 @@ public class AuthController {
         return new MyResponse().setData(responseData);
     }
 
-    // NOTE. [point ++]
     @PostMapping("/join")
     public MyResponse join(@RequestBody AuthDto.Join dto) {
         service.findByEmail(dto.getEmail()).ifPresent(e -> {
@@ -286,6 +292,14 @@ public class AuthController {
         }
 
         return res.setData(true);
+    }
+
+    private Authentication createAuthentication(Long id, String password) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, password);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return authentication;
     }
 
 }

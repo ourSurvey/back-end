@@ -7,7 +7,7 @@ import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.service.survey.SurveyService;
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;

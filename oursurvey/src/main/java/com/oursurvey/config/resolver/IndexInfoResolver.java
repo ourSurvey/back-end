@@ -1,6 +1,6 @@
 package com.oursurvey.config.resolver;
 
-import com.oursurvey.util.JwtUtil;
+import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +12,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 @RequiredArgsConstructor
+@Deprecated
 public class IndexInfoResolver implements HandlerMethodArgumentResolver {
     private final JwtUtil jwtUtil;
 

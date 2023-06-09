@@ -1,41 +1,19 @@
 package com.oursurvey.tdd;
 
-import antlr.Token;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.oursurvey.controller.AuthController;
-import com.oursurvey.dto.AuthDto;
-import com.oursurvey.dto.TokenDto;
 import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Grade;
-import com.oursurvey.entity.Point;
 import com.oursurvey.entity.User;
 import com.oursurvey.repo.grade.GradeRepo;
 import com.oursurvey.repo.point.PointRepo;
 import com.oursurvey.repo.user.UserRepo;
-import com.oursurvey.service.user.UserService;
 import com.oursurvey.service.user.UserServiceImpl;
-import com.oursurvey.util.JwtUtil;
-import org.hibernate.service.spi.InjectService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Optional;
-
 import static org.mockito.BDDMockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
