@@ -30,13 +30,16 @@ public class LoggedInRepoImpl implements LoggedInRepoCustom {
     }
 
     @Override
-    public Optional<LoggedIn> getByUserIdDate(Long userId, String date) {
-        // FIXME. 더 알아 봐야함
-        DateTemplate toDate = Expressions.dateTemplate(
-                String.class, "DATE({0})",
-                loggedIn.createDt
-        );
+    public Optional<LoggedIn> getByUserIdDate(Long userId, LocalDate date) {
+        DateTemplate<String> dateFormat =
+                Expressions.dateTemplate(String.class,
+                        "DATE_FORMAT({0}, {1})", loggedIn.createDt, "%Y-%m-%d");
 
-        return Optional.ofNullable(getBaseJoin().where(loggedIn.user.id.eq(userId).and(toDate.eq(date))).fetchOne());
+        return Optional.ofNullable(getBaseJoin()
+                .where(
+                        loggedIn.user.id.eq(userId),
+                        dateFormat.eq(date.toString())
+                ).fetchOne()
+        );
     }
 }

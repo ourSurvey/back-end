@@ -6,5 +6,4 @@ import java.util.Optional;
 
 public interface UserRepoCustom {
     Optional<User> getByEmail(String email);
-    Optional<User> getFromId(Long id);
 }

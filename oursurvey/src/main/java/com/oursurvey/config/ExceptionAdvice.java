@@ -28,8 +28,7 @@ public class ExceptionAdvice {
             CertifiedException.class,
             S3FileUploadException.class,
             InvalidSurveyPeriodException.class,
-            AlreadyReplySurveyException.class,
-            RuntimeException.class
+            AlreadyReplySurveyException.class
     })
     public MyResponse exceptionFor400(Exception e) {
         MyResponse myResponse = new MyResponse().setCode(MyResponse.CLIENT_ERROR).setMessage(e.getMessage());
@@ -45,13 +44,5 @@ public class ExceptionAdvice {
         if (e instanceof InvalidSurveyPeriodException) myResponse.setCode(MyResponse.INVALID_SURVEY_PERIOD);
         if (e instanceof AlreadyReplySurveyException) myResponse.setCode(MyResponse.ALREADY_REPLY_SURVEY);
         return myResponse;
-    }
-
-    /**
-     * 마지막 처리용
-     */
-    @ExceptionHandler
-    public MyResponse exceptionFor500(Exception e) {
-        return new MyResponse().setCode(MyResponse.SERVER_ERROR).setMessage(e.getMessage());
     }
 }

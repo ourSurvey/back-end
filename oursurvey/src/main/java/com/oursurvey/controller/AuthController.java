@@ -67,6 +67,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @RequestBody AuthDto.Login dto) throws Exception {
+        log.warn("login :: ");
         UserDto.Basic user = service.findByEmail(dto.getEmail()).orElseThrow(() -> {
             throw new LoginIdException("invalid id");
         });
@@ -75,26 +76,26 @@ public class AuthController {
             throw new LoginPwdException("invalid pwd");
         }
 
-        TokenType refreshTokenType = TokenType.REFRESH_TOKEN;
-        String accessToken = tokenProvider.createToken(createAuthentication(user.getId(), dto.getPwd()), TokenType.ACCESS_TOKEN);
-        String refreshToken = tokenProvider.createToken(createAuthentication(user.getId(), dto.getPwd()), refreshTokenType);
+        Authentication authentication = createAuthentication(user.getId(), dto.getPwd());
+        String accessToken = tokenProvider.createToken(authentication, TokenType.ACCESS_TOKEN);
+        String refreshToken = tokenProvider.createToken(authentication, TokenType.REFRESH_TOKEN);
 
         Integer sumPoint = pointService.findSumByUserId(user.getId());
         AuthDto.LoginReponse responseData = AuthDto.LoginReponse.builder()
                 .tokenType("Bearer")
                 .access(accessToken)
                 .refresh(refreshToken)
-                .refreshExpire(refreshTokenType.getHours())
+                .refreshExpire(TokenType.REFRESH_TOKEN.getHours())
                 .sumPoint(sumPoint)
                 .savedPoint(0)
                 .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + user.getId(), refreshToken, refreshTokenType.getHours(), TimeUnit.HOURS);
+        vop.set(REDIS_PREFIX_KEY + user.getId(), refreshToken, TokenType.REFRESH_TOKEN.getHours(), TimeUnit.HOURS);
 
         // log & point & experience
-        Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now());
         if (logOpt.isEmpty()) {
             logService.create(LoggedInDto.Create.builder()
                     .userId(user.getId())

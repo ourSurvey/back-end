@@ -3,10 +3,11 @@ package com.oursurvey.service.loggedin;
 import com.oursurvey.dto.repo.LoggedInDto;
 import com.oursurvey.entity.LoggedIn;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface LoggedInService {
-    Optional<LoggedInDto.Base> findByUserIdDate(Long userId, String date);
+    Optional<LoggedInDto.Base> findByUserIdDate(Long userId, LocalDate date);
     Long create(LoggedInDto.Create dto);
 
     default LoggedInDto.Base entityToDto(LoggedIn ent) {

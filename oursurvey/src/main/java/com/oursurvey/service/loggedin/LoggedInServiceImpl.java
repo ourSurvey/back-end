@@ -4,12 +4,12 @@ import com.oursurvey.dto.repo.LoggedInDto;
 import com.oursurvey.entity.LoggedIn;
 import com.oursurvey.entity.User;
 import com.oursurvey.repo.loggedin.LoggedInRepo;
-import com.oursurvey.repo.loggedin.LoggedInRepoImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Slf4j
@@ -20,7 +20,7 @@ public class LoggedInServiceImpl implements LoggedInService {
     private final LoggedInRepo repo;
 
     @Override
-    public Optional<LoggedInDto.Base> findByUserIdDate(Long userId, String date) {
+    public Optional<LoggedInDto.Base> findByUserIdDate(Long userId, LocalDate date) {
         Optional<LoggedIn> opt = repo.getByUserIdDate(userId, date);
         if (opt.isEmpty()) {
             return Optional.empty();

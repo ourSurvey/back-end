@@ -22,13 +22,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.warn("request = {}", request);
         String token = resolveHeader(request);
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request,response);
         }
-
-        filterChain.doFilter(request,response);
     }
 
 

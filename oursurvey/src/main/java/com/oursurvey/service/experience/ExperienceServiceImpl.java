@@ -4,6 +4,7 @@ import com.oursurvey.dto.repo.ExperienceDto;
 import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Grade;
 import com.oursurvey.entity.User;
+import com.oursurvey.exception.ObjectNotFoundException;
 import com.oursurvey.repo.experience.ExperienceRepo;
 import com.oursurvey.repo.grade.GradeRepo;
 import com.oursurvey.repo.user.UserRepo;
@@ -42,7 +43,10 @@ public class ExperienceServiceImpl implements ExperienceService {
         List<Grade> gradeList = gradeRepo.getDesc();
 
         list.forEach(e -> {
-            User user = userRepo.getFromId(e.getUserId()).get();
+            User user = userRepo.findById(e.getUserId()).orElseThrow(() -> {
+                throw new ObjectNotFoundException("Not Found User");
+            });
+
             Grade userGrade = user.getGrade();
             Long gradeId = userGrade.getId();
             Integer gradePivot = userGrade.getPivot();
