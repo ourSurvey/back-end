@@ -12,6 +12,7 @@ import com.oursurvey.entity.Point;
 import com.oursurvey.exception.*;
 import com.oursurvey.jwt.TokenProvider;
 import com.oursurvey.jwt.TokenType;
+import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.loggedin.LoggedInService;
 import com.oursurvey.service.point.PointService;
@@ -21,8 +22,6 @@ import com.oursurvey.util.MailUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.hql.internal.ast.util.TokenPrinters;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
@@ -31,23 +30,24 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import static com.oursurvey.util.CustomValue.MAIL_PREFIX_KEY;
+import static com.oursurvey.util.CustomValue.REDIS_PREFIX_KEY;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final UserService service;
+    private final UserService userService;
     private final PointService pointService;
     private final LoggedInService logService;
     private final ExperienceService experienceService;
@@ -59,16 +59,10 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MailUtil mailUtil;
 
-    @Value("${custom.redis.prefix.key}")
-    private String REDIS_PREFIX_KEY;
-    @Value("${custom.mail.prefix.key}")
-    private String MAIL_PREFIX_KEY;
-
 
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @RequestBody AuthDto.Login dto) throws Exception {
-        log.warn("login :: ");
-        UserDto.Basic user = service.findByEmail(dto.getEmail()).orElseThrow(() -> {
+        UserDto.Basic user = userService.findByEmail(dto.getEmail()).orElseThrow(() -> {
             throw new LoginIdException("invalid id");
         });
 
@@ -85,14 +79,14 @@ public class AuthController {
                 .tokenType("Bearer")
                 .access(accessToken)
                 .refresh(refreshToken)
-                .refreshExpire(TokenType.REFRESH_TOKEN.getHours())
+                .refreshExpire(TokenType.REFRESH_TOKEN.getSecond())
                 .sumPoint(sumPoint)
                 .savedPoint(0)
                 .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + user.getId(), refreshToken, TokenType.REFRESH_TOKEN.getHours(), TimeUnit.HOURS);
+        vop.set(REDIS_PREFIX_KEY + user.getId(), refreshToken, TokenType.REFRESH_TOKEN.getSecond(), TimeUnit.SECONDS);
 
         // log & point & experience
         Optional<LoggedInDto.Base> logOpt = logService.findByUserIdDate(user.getId(), LocalDate.now());
@@ -125,40 +119,46 @@ public class AuthController {
 
     @PostMapping("/join")
     public MyResponse join(@RequestBody AuthDto.Join dto) {
-        service.findByEmail(dto.getEmail()).ifPresent(e -> {
+        userService.findByEmail(dto.getEmail()).ifPresent(e -> {
             throw new DuplicateEmailException("duplicate email");
         });
 
-        Long joinUser = service.create(UserDto.Create.builder()
+        Long joinUser = userService.create(UserDto.Create.builder()
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .pwd(encoder.encode(dto.getPwd()))
                 .build());
 
-        TokenDto token = jwtUtil.createToken(joinUser, true);
+        Authentication authentication = createAuthentication(joinUser, dto.getPwd());
+        String accessToken = tokenProvider.createToken(authentication, TokenType.ACCESS_TOKEN);
         AuthDto.JoinResponse responseData = AuthDto.JoinResponse.builder()
                 .tokenType("Bearer")
-                .access(token.getAccessToken())
+                .access(accessToken)
                 .savedPoint(Point.JOIN_VALUE)
                 .build();
 
         // redis
         ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(REDIS_PREFIX_KEY + joinUser, token.getAccessToken(), JwtUtil.REFRESH_TOKEN_PERIOD, TimeUnit.SECONDS);
+        vop.set(REDIS_PREFIX_KEY + joinUser, accessToken, TokenType.ACCESS_TOKEN.getSecond(), TimeUnit.SECONDS);
         return new MyResponse().setData(responseData);
     }
 
     @PostMapping("/addition")
-    public MyResponse addition(HttpServletRequest request, @RequestBody AuthDto.Addition dto) {
-        Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
-        service.updateAddition(id, UserDto.UpdateAddition.builder().gender(dto.getGender()).age(dto.getAge()).tel(dto.getTel()).build());
+    public MyResponse addition(@RequestBody AuthDto.Addition dto) {
+        Long userId = AuthenticationParser.getIndex();
+        userService.updateAddition(userId, UserDto.UpdateAddition.builder()
+                .gender(dto.getGender())
+                .age(dto.getAge())
+                .tel(dto.getTel())
+                .build());
+
         return new MyResponse();
     }
 
     // 인증번호 발송
     @PostMapping("/take")
-    public MyResponse take(@RequestBody HashMap<String, String> map) throws Exception {
-        String email = map.get("email");
+    public MyResponse take(@RequestBody AuthDto.EmailDto dto) throws Exception {
+        String email = dto.getEmail();
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
@@ -185,8 +185,8 @@ public class AuthController {
 
     // 인증번호 발송
     @PostMapping("/findpwd")
-    public MyResponse findpwd(@RequestBody HashMap<String, String> map) throws Exception {
-        String email = map.get("email");
+    public MyResponse findpwd(@RequestBody AuthDto.EmailDto dto) throws Exception {
+        String email = dto.getEmail();
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 
@@ -194,7 +194,7 @@ public class AuthController {
         vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
 
         AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
-                .token(jwtUtil.createToken(email, 300))
+                .token(tokenProvider.createToken(email, TokenType.TOKEN_EXPIRE_5MINUTE))
                 .build();
 
         return new MyResponse().setData(responseData);
@@ -202,40 +202,39 @@ public class AuthController {
 
     @PostMapping("/resetpwd")
     public MyResponse resetpwd(@RequestBody AuthDto.Resetpwd dto) throws Exception {
-        if (!jwtUtil.validateToken(dto.getToken(), true)) {
+        if (!tokenProvider.validateToken(dto.getToken())) {
             throw new AuthFailException("invalid token");
         }
 
-        Claims claims = jwtUtil.parseTokenString(dto.getToken());
+        Claims claims = tokenProvider.parseToken(dto.getToken());
         String email = claims.get("string", String.class);
 
-        service.updatePwd(email, encoder.encode(dto.getPwd()));
+        userService.updatePwd(email, encoder.encode(dto.getPwd()));
         return new MyResponse();
     }
 
     @GetMapping("/logout")
     public MyResponse logout(HttpServletRequest request) {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null) {
+        String token = tokenProvider.resolveHeader(request);
+        if (token == null) {
             throw new InvalidTokenException();
         }
 
-        Boolean isValid = jwtUtil.validateToken(header);
+        boolean isValid = tokenProvider.validateToken(token);
         if (!isValid) {
             throw new InvalidRefreshTokenException();
         }
 
-        Claims claims = jwtUtil.parseToken(header);
+        Claims claims = tokenProvider.parseToken(token);
         String tokenType = claims.get("tokenType", String.class);
         if (!tokenType.equals("refresh")) {
             throw new InvalidRefreshTokenException("not refresh token");
         }
 
-        Long id = claims.get("id", Long.class);
+        Long id = Long.parseLong(claims.getSubject());
         String redisKey = REDIS_PREFIX_KEY + id;
-        String token = jwtUtil.extractToken(header);
         ValueOperations<String, Object> vop = redis.opsForValue();
-        if (!vop.get(redisKey).equals(token)) {
+        if (!Objects.equals(vop.get(redisKey), token)) {
             throw new InvalidRefreshTokenException();
         }
 
@@ -247,48 +246,48 @@ public class AuthController {
     // access token 리프레시
     @GetMapping("/refresh")
     public MyResponse refresh(HttpServletRequest request) throws Exception {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null) {
+        String token = tokenProvider.resolveHeader(request);
+        if (token == null) {
             throw new InvalidTokenException();
         }
 
-        Boolean validate = jwtUtil.validateToken(header);
+        boolean validate = tokenProvider.validateToken(token);
         if (!validate) {
             throw new InvalidTokenException();
         }
 
-        Claims claims = jwtUtil.parseToken(header);
-        String subject = claims.getSubject();
+        Claims claims = tokenProvider.parseToken(token);
         String tokenType = claims.get("tokenType", String.class);
-        if (!subject.equals("refreshToken") || !tokenType.equals("refresh")) {
+        if (!tokenType.equals("refresh")) {
             throw new InvalidRefreshTokenException();
         }
 
-        Long id = claims.get("id", Long.class);
-        TokenDto token = jwtUtil.createToken(id, true);
-        HashMap<String, Object> dataMap = new HashMap<>();
-        dataMap.put("tokenType", "Bearer");
-        dataMap.put("access", token.getAccessToken());
-        return new MyResponse().setData(dataMap);
+        Long id = Long.parseLong(claims.getSubject());
+        Authentication authentication = createAuthentication(id, "");
+        String access = tokenProvider.createToken(authentication, TokenType.ACCESS_TOKEN);
+        TokenDto.Response response = TokenDto.Response.builder()
+                .tokenType("Bearer")
+                .access(access)
+                .build();
+
+        return new MyResponse().setData(response);
     }
 
     @GetMapping("/validate")
     public MyResponse validate(HttpServletRequest request) throws Exception {
         MyResponse res = new MyResponse();
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String header = tokenProvider.resolveHeader(request);
         if (header == null) {
             return res.setCode(MyResponse.INVALID_TOKEN).setData(false);
         }
 
-        Boolean validate = jwtUtil.validateToken(header);
-        if (!validate) {
+        if (!tokenProvider.validateToken(header)) {
             return res.setCode(MyResponse.INVALID_TOKEN).setData(false);
         }
 
-        Claims claims = jwtUtil.parseToken(header);
-        String subject = claims.getSubject();
+        Claims claims = tokenProvider.parseToken(header);
         String tokenType = claims.get("tokenType", String.class);
-        if (!subject.equals("accessToken") || !tokenType.equals("access")) {
+        if (!tokenType.equals("access")) {
             return res.setCode(MyResponse.INVALID_ACCESSTOKEN).setData(false);
         }
 

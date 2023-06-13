@@ -4,6 +4,7 @@ import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.AnswerDto;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.Point;
+import com.oursurvey.jwt.TokenProvider;
 import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
@@ -30,9 +31,7 @@ import java.util.stream.Collectors;
 public class ReplyController {
     private final ReplyService service;
     private final AnswerService answerService;
-    private final PointService pointService;
-
-    private final JwtUtil jwtUtil;
+    private final TokenProvider tokenProvider;
 
     @GetMapping("/{id}")
     public MyResponse get(@PathVariable Long id) {
@@ -46,23 +45,21 @@ public class ReplyController {
     // NOTE. [point ++, experience ++]
     @PostMapping
     public MyResponse post(HttpServletRequest request, @RequestBody String json) {
-        MyResponse res = new MyResponse();
-
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Long loginUserId = null;
-        if (StringUtils.hasText(header)) {
-             loginUserId = jwtUtil.getLoginUserId(header);
+        String token = tokenProvider.resolveHeader(request);
+        Long userId = null;
+        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+            userId = Long.parseLong(tokenProvider.parseToken(token).getSubject());
         }
 
         ReplyDto.Create dto = getReplyFromJson(new JSONObject(json));
-        dto.setUserId(loginUserId);
+        dto.setUserId(userId);
 
         // save reply
         service.create(dto);
 
         HashMap<String, Integer> map = new HashMap<>();
-        map.put("savedPoint", loginUserId != null ? Point.REPLY_SURVEY_VALUE : 0);
-        return res.setData(map);
+        map.put("savedPoint", userId != null ? Point.REPLY_SURVEY_VALUE : 0);
+        return new MyResponse().setData(map);
     }
 
     private ReplyDto.Create getReplyFromJson(JSONObject j) {

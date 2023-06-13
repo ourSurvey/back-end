@@ -5,17 +5,23 @@ import com.oursurvey.config.resolver.IndexInfoAnno;
 import com.oursurvey.dto.HomeDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.SurveyDto;
+import com.oursurvey.jwt.JwtUtil;
+import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.survey.SurveyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,11 +32,16 @@ import java.util.List;
 public class HomeController {
     private final SurveyService surveyService;
     private final PointService pointService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping
-    public MyResponse get(@IndexInfoAnno IndexInfo index, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+    public MyResponse get(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         LocalDate now = LocalDate.now();
-        Long userId = index.getId();
+
+        Long userId = AuthenticationParser.getIndex();
+        System.out.println("userId = " + userId);
 
         List<SurveyDto.MyList> mySurvey = surveyService.findByUserId(userId);
         mySurvey.forEach(e -> {

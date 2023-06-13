@@ -15,6 +15,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class ActiveController {
     private final Environment env;
+
     @GetMapping
     public String active() {
         return Arrays.stream(env.getActiveProfiles())

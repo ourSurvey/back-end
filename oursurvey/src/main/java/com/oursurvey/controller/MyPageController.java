@@ -4,6 +4,7 @@ import com.oursurvey.dto.MyPageDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.dto.repo.SurveyDto;
+import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.reply.ReplyService;
 import com.oursurvey.service.survey.SurveyService;
 import com.oursurvey.jwt.JwtUtil;
@@ -29,11 +30,9 @@ public class MyPageController {
     private final SurveyService surveyService;
     private final ReplyService replyService;
 
-    private final JwtUtil jwtUtil;
-
     @GetMapping("/survey")
-    public MyResponse survey(HttpServletRequest request, @RequestParam(required = false) Integer status) {
-        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+    public MyResponse survey(@RequestParam(required = false) Integer status) {
+        Long userId = AuthenticationParser.getIndex();
 
         LocalDate now = LocalDate.now();
         List<SurveyDto.MyList> surveyData = surveyService.findByUserId(userId);
@@ -63,8 +62,8 @@ public class MyPageController {
     }
 
     @GetMapping("/survey/temp")
-    public MyResponse surveyTemp(HttpServletRequest request) {
-        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+    public MyResponse surveyTemp() {
+        Long userId = AuthenticationParser.getIndex();
         List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(userId);
 
         MyPageDto.SurveyTempResponse responseData = MyPageDto.SurveyTempResponse.builder()
@@ -77,8 +76,8 @@ public class MyPageController {
 
 
     @GetMapping("/reply")
-    public MyResponse reply(HttpServletRequest request, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
-        Long userId = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+    public MyResponse reply(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size) {
+        Long userId = AuthenticationParser.getIndex();
 
         List<ReplyDto.MyList> replyList = replyService.findByUserId(userId);
         List<String> surveyIds = replyList.stream().map(ReplyDto.MyList::getSurveyId).toList();

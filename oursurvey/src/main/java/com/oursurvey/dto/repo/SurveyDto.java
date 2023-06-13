@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SurveyDto {
     @Getter
@@ -121,5 +123,46 @@ public class SurveyDto {
         private String subject;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING, timezone = "Asia/Seoul")
         private LocalDateTime createdDt;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class TempCheckDto {
+        private Integer tempCount;
+        private MyListTemp tempRecent;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class ResultEachDto {
+        private Detail survey;
+        private List<Long> replyIdList;
+        private Map<String, String> firstReply;
+    }
+
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class ResultDto {
+        private Detail survey;
+        private ArrayList<QuestionDto.Summary> questionSummaryList;
+    }
+
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    @Builder
+    public static class PageDto {
+        private Long totalElements;
+        private Integer totalPages;
+        private Boolean isLast;
+        private Integer currentPage;
+        private List<Lizt> content;
     }
 }

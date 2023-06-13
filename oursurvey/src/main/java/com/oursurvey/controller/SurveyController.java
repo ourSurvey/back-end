@@ -3,6 +3,7 @@ package com.oursurvey.controller;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.*;
 import com.oursurvey.exception.ObjectNotFoundException;
+import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.answer.AnswerService;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.oursurvey.dto.repo.SurveyDto.*;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/survey")
@@ -38,93 +41,83 @@ public class SurveyController {
 
     @SchemaMapping(typeName = "Query", value = "getSurveyToPage")
     public MyResponse getSurveyToPage(@Argument Integer page, @Argument Integer size, @Argument String searchText) {
-        MyResponse res = new MyResponse();
-
-        Page<SurveyDto.Lizt> lizts = surveyService.find(PageRequest.of(page, size), "searchText", searchText);
-        lizts.map(SurveyDto.Lizt::convertHashtagListToList);
-
-        HashMap<String, Object> dataMap = new HashMap<>();
-        dataMap.put("totalElements", lizts.getTotalElements());
-        dataMap.put("totalPages", lizts.getTotalPages());
-        dataMap.put("isLast", lizts.isLast());
-        dataMap.put("currentPage", page);
-        dataMap.put("content", lizts.getContent());
-        return res.setData(dataMap);
+        Page<Lizt> lizts = surveyService.find(PageRequest.of(page, size), "searchText", searchText);
+        return new MyResponse().setData(
+                PageDto.builder()
+                        .totalElements(lizts.getTotalElements())
+                        .totalPages(lizts.getTotalPages())
+                        .isLast(lizts.isLast())
+                        .currentPage(page)
+                        .content(lizts.getContent())
+                        .build()
+        );
     }
 
     @GetMapping("/{id}")
     public MyResponse get(@PathVariable String id) {
-        MyResponse res = new MyResponse();
-        SurveyDto.Detail survey = surveyService.findById(id).orElseThrow(() -> {
+        Detail survey = surveyService.findById(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
         });
 
-        return res.setData(survey);
+        return new MyResponse().setData(survey);
     }
 
     @GetMapping("/tempCheck")
     public MyResponse beforeCreate(HttpServletRequest request) {
-        MyResponse res = new MyResponse();
-        HashMap<String, Object> dataMap = new HashMap<>();
+        Long userId = AuthenticationParser.getIndex();
 
-        List<SurveyDto.MyListTemp> tempList = surveyService.findTempByUserId(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)));
-        dataMap.put("tempCount", tempList.size());
-        dataMap.put("tempRecent", tempList.size() > 0 ? tempList.get(0) : null);
-        return res.setData(dataMap);
+        List<MyListTemp> tempList = surveyService.findTempByUserId(userId);
+        return new MyResponse().setData(TempCheckDto.builder()
+                .tempCount(tempList.size())
+                .tempRecent(tempList.size() > 0 ? tempList.get(0) : null)
+                .build());
     }
 
     // NOTE. [point ++, experience ++]
     @PostMapping
-    public MyResponse create(HttpServletRequest request, @RequestBody String json) {
-        MyResponse res = new MyResponse();
+    public MyResponse create(@RequestBody String json) {
+        Long userId = AuthenticationParser.getIndex();
 
-        Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
         JSONObject object = new JSONObject(json);
-        SurveyDto.Create surveyDto = getSurveyFromJson(object);
-        surveyDto.setUserId(id);
+        Create surveyDto = getSurveyFromJson(object);
+        surveyDto.setUserId(userId);
 
         // save survey
         surveyService.create(surveyDto);
-        return res;
+        return new MyResponse();
     }
 
     // 설문 개별결과
     @GetMapping("/result/each/{surveyId}")
     public MyResponse resultEach(@PathVariable String surveyId) {
-        MyResponse res = new MyResponse();
-
-        HashMap<String, Object> dataMap = new HashMap<>();
-        SurveyDto.Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
+        Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
         });
-
-        dataMap.put("survey", surveyDetail);
         List<Long> replyIdList = replyService.findIdBySurveyId(surveyId);
-        dataMap.put("replyIdList", replyIdList);
+
+        ResultEachDto.ResultEachDtoBuilder builder = ResultEachDto.builder()
+                .survey(surveyDetail)
+                .replyIdList(replyIdList);
 
         if (replyIdList.size() > 0) {
             Long firstReplyId = replyIdList.get(0);
             List<AnswerDto.Base> answerList = answerService.findByReplyId(firstReplyId);
-            dataMap.put("reply_" + firstReplyId, answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse)));
+            Map<String, String> collect = answerList.stream().collect(Collectors.toMap(AnswerDto.Base::getQuestionId, AnswerDto.Base::getResponse));
+            builder.firstReply(collect);
         }
 
-        return res.setData(dataMap);
+        return new MyResponse().setData(builder.build());
     }
 
     // 설문 결과 요약
     @GetMapping("/result/summary/{surveyId}")
     public MyResponse result(@PathVariable String surveyId) {
-        MyResponse res = new MyResponse();
-
-        HashMap<String, Object> dataMap = new HashMap<>();
-        SurveyDto.Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
+        Detail surveyDetail = surveyService.findById(surveyId).orElseThrow(() -> {
             throw new ObjectNotFoundException("no survey");
         });
 
 
-        dataMap.put("survey", surveyDetail);
         ArrayList<QuestionDto.Summary> summaryList = new ArrayList<>();
-
         List<SectionDto.Detail> sectionList = surveyDetail.getSectionList();
         sectionList.forEach(section -> {
             section.getQuestionList().forEach(question -> {
@@ -177,21 +170,23 @@ public class SurveyController {
                 }
             }
         }
-        dataMap.put("questionSummarys", summaryList);
 
-        return res.setData(dataMap);
+        return new MyResponse().setData(
+                ResultDto.builder()
+                .survey(surveyDetail)
+                .questionSummaryList(summaryList)
+                .build());
     }
 
     // NOTE. [point ++, experience ++]
     @GetMapping("/pull/{surveyId}")
     public MyResponse pull(HttpServletRequest request, @PathVariable String surveyId) {
-        MyResponse res = new MyResponse();
         surveyService.pull(jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION)), surveyId);
-        return res;
+        return new MyResponse();
     }
 
-    private SurveyDto.Create getSurveyFromJson(JSONObject object) {
-        return SurveyDto.Create.builder()
+    private Create getSurveyFromJson(JSONObject object) {
+        return Create.builder()
                 .id(object.getString("id"))
                 .subject(object.getString("subject"))
                 .content(object.getString("content"))

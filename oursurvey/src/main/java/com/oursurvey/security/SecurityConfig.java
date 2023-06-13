@@ -1,6 +1,5 @@
 package com.oursurvey.security;
 
-import com.oursurvey.jwt.JwtFilter;
 import com.oursurvey.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

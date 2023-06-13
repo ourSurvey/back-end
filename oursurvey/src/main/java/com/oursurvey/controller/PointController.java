@@ -1,6 +1,7 @@
 package com.oursurvey.controller;
 
 import com.oursurvey.dto.MyResponse;
+import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.point.PointService;
 import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class PointController {
     private final PointService service;
-    private final JwtUtil jwtUtil;
 
     @GetMapping
-    public MyResponse get(HttpServletRequest request) {
-        Long id = jwtUtil.getLoginUserId(request.getHeader(HttpHeaders.AUTHORIZATION));
+    public MyResponse get() {
+        Long id = AuthenticationParser.getIndex();
         Integer sum = service.findSumByUserId(id);
 
         return new MyResponse().setData(sum);

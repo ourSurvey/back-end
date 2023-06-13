@@ -1,6 +1,8 @@
 server:
-  port: 8081
+  port: 8080
 spring:
+  pid:
+    file: server.pid
   profiles:
     active: local
   jpa:
@@ -14,7 +16,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        dialect: com.oursurvey.config.MysqlFunctionConfig
   datasource:
     url: ENC(OyFRGw1m86ob8mmLZnTqycXPKZbZbKcPCyjIU6/I6X0/1ljzU2TaJlwVCO7eRm/7xYfwCcIEaiHdpsNgY4YcIC4FjCwbdIpCfHuDX/nEGiaEHk+rQd6KkHdJnh5Aqf1dM1/D7dzdZIp8WWXLLWlthGIP1J24me60oRT19rpUicWiFbonbGf5rY/V5Zn1oqz6W0wsmT+aQ3nCrIJnXm/IFlqsE9WBL6ZOZbVd5J6zhE0=)
     username: ENC(3peVfBHUYvOf+N3R98kD2Q==)
@@ -59,3 +62,15 @@ custom:
   jwt.key: ENC(r8jJCvzs/Rpq6kZ8dyE7hbiXk/bpq80frxX/AW4tlCAtGi3YUJ7I1l7tG21aYMa42ZcL6sYSiQ1pJfw4V0RbcspB+4s4OF6q1RWuiO6chx4=)
   redis.prefix.key: ENC(r8ZSfM6EqGGg1CCHxB2zROl2dpo9csyn)
   mail.prefix.key: ENC(cEoUDAnUldZJfqK6MW2Nj3UidffO2rBWumPSmbQc5t4=)
+
+---
+
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: ENC(EQwzdqWV9XLI9tJQcnHYlZKM/AGeNG0Tpg8+U342L5ot+Zhlw2/gKGZTStF4x/Yrxij6RCeUpJGxJZ00t6a2ayhhgwMSujYxkcoxiyZ2wxU+iJD697y+vNgAveTbdSHiIufdhB7QCWd6yYcULCYoIse+DqAL3i2yZq4jCdmGEYuPUsFOS1IYeGXiUZD3FQweSVjSLSKo2LXu4wgmOcwGQx9JC0tZW9lzX6fRDYrtfLBOHXrJgkHsUQ==)
+    username: ENC(bhxhX2uvjXZ+ir9HIrF+dRcIuqe+UU2y)
+    password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)
+  redis:
+    password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)

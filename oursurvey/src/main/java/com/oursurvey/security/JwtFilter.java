@@ -1,5 +1,6 @@
-package com.oursurvey.jwt;
+package com.oursurvey.security;
 
+import com.oursurvey.exception.AuthFailException;
 import com.oursurvey.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +23,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.warn("request = {}", request);
         String token = resolveHeader(request);
         if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request,response);
+        } else {
+            FilterException jwtError = FilterException.JWT_ERROR;
+            request.setAttribute(jwtError.getErrorName(), jwtError.getMessage());
+            throw new AuthFailException(jwtError.getMessage());
         }
     }
 
@@ -39,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (header.startsWith("Bearer ")) {
-            return header.substring(7);
+            return header.substring("Bearer ".length());
         }
 
         return header;

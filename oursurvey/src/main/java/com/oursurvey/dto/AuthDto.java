@@ -8,36 +8,26 @@ import javax.validation.constraints.NotBlank;
 public class AuthDto {
     @Getter
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
     @AllArgsConstructor
     public static class Login {
-        @Email
-        @NotBlank
         private String email;
-
-        @NotBlank
         private String pwd;
     }
 
     @Getter
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
     @AllArgsConstructor
     public static class Join {
-        @Email
-        @NotBlank
         private String email;
-
-        @NotBlank
         private String nickname;
-
-        @NotBlank
         private String pwd;
     }
 
     @Getter
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
     @AllArgsConstructor
     public static class Addition {
         private String gender;
@@ -47,14 +37,10 @@ public class AuthDto {
 
     @Getter
     @ToString
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
     @AllArgsConstructor
     public static class Certified {
-        @Email
-        @NotBlank
         private String email;
-
-        @NotBlank
         private String code;
     }
 
@@ -63,10 +49,7 @@ public class AuthDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class Resetpwd {
-        @NotBlank
         private String token;
-
-        @NotBlank
         private String pwd;
     }
 
@@ -103,5 +86,12 @@ public class AuthDto {
     @Builder
     public static class FindPasswordResponse {
         private String token;
+    }
+
+    @Getter
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class EmailDto {
+        private String email;
     }
 }
