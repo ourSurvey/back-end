@@ -74,3 +74,8 @@ spring:
     password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)
   redis:
     password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false

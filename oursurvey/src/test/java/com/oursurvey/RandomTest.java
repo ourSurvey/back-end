@@ -2,6 +2,7 @@ package com.oursurvey;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -15,9 +16,5 @@ public class RandomTest {
         }
 
         System.out.println("code = " + code);
-    }
-
-    @Test
-    void test2() {
     }
 }

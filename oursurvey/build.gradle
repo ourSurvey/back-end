@@ -2,6 +2,9 @@
 buildscript {
 	ext {
 		queryDslVersion = "5.0.0"
+		major_version = '0'
+		minor_version = '0'
+		build_version = '2'
 	}
 }
 
@@ -16,7 +19,7 @@ plugins {
 }
 
 group = 'com'
-version = '0.0.1-SNAPSHOT'
+version = "$major_version.$minor_version.$build_version"
 sourceCompatibility = '17'
 
 configurations {
@@ -44,7 +47,7 @@ dependencies {
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 
 	// https://mvnrepository.com/artifact/com.github.gavlyukovskiy/p6spy-spring-boot-starter
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+//	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
 	implementation 'org.springframework.boot:spring-boot-starter-security:2.7.0'
