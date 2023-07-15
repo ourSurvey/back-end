@@ -32,7 +32,7 @@ spring:
       pool:
         enabled: true
     port: 6379
-    password: ENC(eX4FMuMGP/qzSa25iQYvSg==)
+    password: ENC(b0V7ocUbdWSnRlUrw2Zjng==)
     host: localhost
   mail:
     host: smtp.gmail.com
@@ -52,7 +52,6 @@ jasypt:
       prefix: ENC(
       suffix: )
     algorithm: PBEWithMD5AndDES
-    password:
 custom:
   jwt.key: ENC(r8jJCvzs/Rpq6kZ8dyE7hbiXk/bpq80frxX/AW4tlCAtGi3YUJ7I1l7tG21aYMa42ZcL6sYSiQ1pJfw4V0RbcspB+4s4OF6q1RWuiO6chx4=)
   redis.prefix.key: ENC(r8ZSfM6EqGGg1CCHxB2zROl2dpo9csyn)
@@ -61,8 +60,9 @@ custom:
 ---
 
 spring:
-  profiles:
-    active: test
+  config:
+    activate:
+      on-profile: test
   datasource:
     url: ENC(EQwzdqWV9XLI9tJQcnHYlZKM/AGeNG0Tpg8+U342L5ot+Zhlw2/gKGZTStF4x/Yrxij6RCeUpJGxJZ00t6a2ayhhgwMSujYxkcoxiyZ2wxU+iJD697y+vNgAveTbdSHiIufdhB7QCWd6yYcULCYoIse+DqAL3i2yZq4jCdmGEYuPUsFOS1IYeGXiUZD3FQweSVjSLSKo2LXu4wgmOcwGQx9JC0tZW9lzX6fRDYrtfLBOHXrJgkHsUQ==)
     username: ENC(bhxhX2uvjXZ+ir9HIrF+dRcIuqe+UU2y)

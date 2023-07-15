@@ -31,6 +31,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -173,12 +174,9 @@ public class AuthController {
     public MyResponse certified(@RequestBody AuthDto.Certified dto) throws Exception {
         ValueOperations<String, Object> vop = redis.opsForValue();
         String code = String.valueOf(vop.get(MAIL_PREFIX_KEY + dto.getEmail()));
-        if (code == null) {
-            throw new CertifiedException("invalid code");
-        }
 
-        if (!code.equals(dto.getCode())) {
-            throw new CertifiedException("not matched code");
+        if (!StringUtils.hasText(code) || !code.equals(dto.getCode())) {
+            throw new CertifiedException("Invalid or Not Matched Code");
         }
 
         return new MyResponse();
@@ -221,8 +219,7 @@ public class AuthController {
             throw new InvalidTokenException();
         }
 
-        boolean isValid = tokenProvider.validateToken(token);
-        if (!isValid) {
+        if (!tokenProvider.validateToken(token)) {
             throw new InvalidRefreshTokenException();
         }
 
