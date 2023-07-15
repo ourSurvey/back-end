@@ -20,9 +20,9 @@ import static com.oursurvey.dto.MyResponse.INVALID_CERTIFIED_CODE;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         String errorMessage = request.getAttribute(FilterException.JWT_ERROR.getErrorName()).toString();
-
+        log.debug("@@ CustomAuthenticationEntryPoint.commence");
         response.setStatus(401);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         try (OutputStream os = response.getOutputStream()) {

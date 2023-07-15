@@ -6,14 +6,11 @@ import com.oursurvey.dto.repo.ReplyDto;
 import com.oursurvey.entity.Point;
 import com.oursurvey.jwt.TokenProvider;
 import com.oursurvey.service.answer.AnswerService;
-import com.oursurvey.service.point.PointService;
 import com.oursurvey.service.reply.ReplyService;
-import com.oursurvey.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 

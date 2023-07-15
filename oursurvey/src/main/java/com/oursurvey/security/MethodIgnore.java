@@ -9,6 +9,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@Deprecated
 public enum MethodIgnore {
     GET_IGNORE(List.of(
             "/",

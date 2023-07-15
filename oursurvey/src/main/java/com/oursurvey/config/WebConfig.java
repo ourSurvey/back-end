@@ -19,14 +19,14 @@ public class WebConfig implements WebMvcConfigurer {
         return new JPAQueryFactory(em);
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+    // @Override
+    // public void addCorsMappings(CorsRegistry registry) {
+    //     registry.addMapping("/**")
+    //             .allowedOriginPatterns("*")
+    //             .allowedMethods("*")
+    //             .allowedHeaders("*")
+    //             .allowCredentials(true);
+    // }
 
     // use Security jwt filter
 

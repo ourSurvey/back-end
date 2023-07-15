@@ -28,7 +28,9 @@ public class ExceptionAdvice {
             CertifiedException.class,
             S3FileUploadException.class,
             InvalidSurveyPeriodException.class,
-            AlreadyReplySurveyException.class
+            AlreadyReplySurveyException.class,
+            ObjectNotFoundException.class,
+            Exception.class
     })
     public MyResponse exceptionFor400(Exception e) {
         MyResponse myResponse = new MyResponse().setCode(MyResponse.CLIENT_ERROR).setMessage(e.getMessage());
@@ -42,7 +44,8 @@ public class ExceptionAdvice {
         if (e instanceof CertifiedException) myResponse.setCode(MyResponse.INVALID_CERTIFIED_CODE);
         if (e instanceof S3FileUploadException) myResponse.setCode(MyResponse.S3_FILE_UPLOAD);
         if (e instanceof InvalidSurveyPeriodException) myResponse.setCode(MyResponse.INVALID_SURVEY_PERIOD);
-        if (e instanceof AlreadyReplySurveyException) myResponse.setCode(MyResponse.ALREADY_REPLY_SURVEY);
+        if (e instanceof ObjectNotFoundException) myResponse.setCode(MyResponse.CLIENT_ERROR);
+
         return myResponse;
     }
 }

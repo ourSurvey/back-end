@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
@@ -38,51 +39,67 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .antMatchers(HttpMethod.GET, MethodIgnore.GET_IGNORE.toStringArray())
-                .antMatchers(HttpMethod.POST, MethodIgnore.POST_IGNORE.toStringArray())
-                .antMatchers(HttpMethod.PUT, MethodIgnore.PUT_IGNORE.toStringArray())
-                .antMatchers(HttpMethod.PATCH, MethodIgnore.PATCH_IGNORE.toStringArray())
-                .antMatchers(HttpMethod.DELETE, MethodIgnore.DELETE_IGNORE.toStringArray());
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic().disable()
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().disable()
-                .formLogin().disable()
-                .logout().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint())
-                .and()
 
+                .headers().frameOptions().disable()
+
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint())
+
+                .and()
                 .authorizeRequests()
                 .antMatchers("/h2-console/**").permitAll()
+                .antMatchers(StringUtils.toStringArray(getPermitAllList())).permitAll()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .and()
-
-                .authorizeRequests()
                 .anyRequest().authenticated()
+
                 .and()
-                .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+
+                .formLogin().disable()
+                .logout().disable()
+        ;
 
         return http.build();
+    }
+
+    private List<String> getPermitAllList() {
+        return List.of(
+                "/",
+                "/api/auth/logout",
+                "/api/auth/refresh",
+                "/api/auth/validate",
+                "/api/active",
+                "/api/auth/login",
+                "/api/auth/join",
+                "/api/auth/take",
+                "/api/auth/certified",
+                "/api/auth/findpwd",
+                "/api/auth/resetpwd",
+                "/api/reply"
+        );
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration conf = new CorsConfiguration();
+        List<String> allowedOrigins = List.of(
+                "*"
+        );
 
-        conf.setAllowedOrigins(List.of("*"));
-        conf.setAllowedHeaders(List.of("*"));
-        conf.setAllowedMethods(List.of("*"));
-        conf.setExposedHeaders(List.of("*"));
+        conf.setAllowedOriginPatterns(allowedOrigins);
+        conf.addAllowedHeader("*");
+        conf.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"));
         conf.setMaxAge(3600L);
         conf.setAllowCredentials(true);
 
@@ -90,4 +107,15 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", conf);
         return source;
     }
+
+
+    // @Bean // permitAll을 사용할 것
+    // public WebSecurityCustomizer webSecurityCustomizer() {
+    //     return (web) -> web.ignoring()
+    //             .antMatchers(HttpMethod.GET, MethodIgnore.GET_IGNORE.toStringArray())
+    //             .antMatchers(HttpMethod.POST, MethodIgnore.POST_IGNORE.toStringArray())
+    //             .antMatchers(HttpMethod.PUT, MethodIgnore.PUT_IGNORE.toStringArray())
+    //             .antMatchers(HttpMethod.PATCH, MethodIgnore.PATCH_IGNORE.toStringArray())
+    //             .antMatchers(HttpMethod.DELETE, MethodIgnore.DELETE_IGNORE.toStringArray());
+    // }
 }

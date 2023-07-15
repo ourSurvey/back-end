@@ -9,9 +9,11 @@ import com.oursurvey.dto.repo.PointDto;
 import com.oursurvey.dto.repo.UserDto;
 import com.oursurvey.entity.Experience;
 import com.oursurvey.entity.Point;
+import com.oursurvey.entity.User;
 import com.oursurvey.exception.*;
 import com.oursurvey.jwt.TokenProvider;
 import com.oursurvey.jwt.TokenType;
+import com.oursurvey.repo.user.UserRepo;
 import com.oursurvey.security.AuthenticationParser;
 import com.oursurvey.service.experience.ExperienceService;
 import com.oursurvey.service.loggedin.LoggedInService;
@@ -24,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +48,7 @@ import static com.oursurvey.util.CustomValue.REDIS_PREFIX_KEY;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final UserService userService;
+    private final UserRepo userRepo;
     private final PointService pointService;
     private final LoggedInService logService;
     private final ExperienceService experienceService;
@@ -62,10 +63,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @RequestBody AuthDto.Login dto) throws Exception {
-        UserDto.Basic user = userService.findByEmail(dto.getEmail()).orElseThrow(() -> {
-            throw new LoginIdException("invalid id");
-        });
-
+        UserDto.Basic user = userService.findByEmail(dto.getEmail());
         if (!encoder.matches(dto.getPwd(), user.getPwd())) {
             throw new LoginPwdException("invalid pwd");
         }
@@ -119,8 +117,9 @@ public class AuthController {
 
     @PostMapping("/join")
     public MyResponse join(@RequestBody AuthDto.Join dto) {
-        userService.findByEmail(dto.getEmail()).ifPresent(e -> {
-            throw new DuplicateEmailException("duplicate email");
+        Optional<User> optional = userRepo.findByEmail(dto.getEmail());
+        optional.ifPresent(user -> {
+            throw new DuplicateEmailException("Already exist email");
         });
 
         Long joinUser = userService.create(UserDto.Create.builder()
@@ -158,7 +157,9 @@ public class AuthController {
     // 인증번호 발송
     @PostMapping("/take")
     public MyResponse take(@RequestBody AuthDto.EmailDto dto) throws Exception {
-        String email = dto.getEmail();
+        UserDto.Basic user = userService.findByEmail(dto.getEmail());
+        String email = user.getEmail();
+
         String code = mailUtil.generateAuthCode();
         mailUtil.sendMail(email, "인증코드", code);
 

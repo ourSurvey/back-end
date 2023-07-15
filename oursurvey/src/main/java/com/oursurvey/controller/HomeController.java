@@ -1,7 +1,5 @@
 package com.oursurvey.controller;
 
-import com.oursurvey.config.resolver.IndexInfo;
-import com.oursurvey.config.resolver.IndexInfoAnno;
 import com.oursurvey.dto.HomeDto;
 import com.oursurvey.dto.MyResponse;
 import com.oursurvey.dto.repo.SurveyDto;
@@ -13,15 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 

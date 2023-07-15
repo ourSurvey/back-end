@@ -6,7 +6,7 @@ import com.oursurvey.entity.User;
 import com.oursurvey.repo.grade.GradeRepo;
 import com.oursurvey.repo.point.PointRepo;
 import com.oursurvey.repo.user.UserRepo;
-import com.oursurvey.service.user.UserServiceImpl;
+import com.oursurvey.service.user.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -23,7 +23,7 @@ public class TddMockTest {
     class ServiceMock {
         @Spy
         @InjectMocks
-        UserServiceImpl userService;
+        UserService userService;
 
         @Mock
         UserRepo userRepo;

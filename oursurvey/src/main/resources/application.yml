@@ -53,11 +53,6 @@ jasypt:
       suffix: )
     algorithm: PBEWithMD5AndDES
     password:
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: true
-      multiline: true
 custom:
   jwt.key: ENC(r8jJCvzs/Rpq6kZ8dyE7hbiXk/bpq80frxX/AW4tlCAtGi3YUJ7I1l7tG21aYMa42ZcL6sYSiQ1pJfw4V0RbcspB+4s4OF6q1RWuiO6chx4=)
   redis.prefix.key: ENC(r8ZSfM6EqGGg1CCHxB2zROl2dpo9csyn)

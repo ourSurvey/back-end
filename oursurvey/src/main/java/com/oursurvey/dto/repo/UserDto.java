@@ -20,15 +20,14 @@ public class UserDto {
         private String tel;
 
         @Builder
-        public Basic(User entity) {
-            this.id = entity.getId();
-            this.grade = GradeDto.Basic.builder().entity(entity.getGrade()).build();
-            this.email = entity.getEmail();
-            // this.email = entity.get();
-            this.pwd = entity.getPwd();
-            this.gender = entity.getGender();
-            this.age = entity.getAge();
-            this.tel = entity.getTel();
+        public Basic(User user) {
+            this.id = user.getId();
+            this.grade = GradeDto.Basic.builder().entity(user.getGrade()).build();
+            this.email = user.getEmail();
+            this.pwd = user.getPwd();
+            this.gender = user.getGender();
+            this.age = user.getAge();
+            this.tel = user.getTel();
         }
     }
 
