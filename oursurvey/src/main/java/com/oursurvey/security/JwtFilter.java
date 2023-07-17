@@ -24,9 +24,17 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = resolveHeader(request);
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            Authentication authentication = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("@@ JwtFilter URI = {}, token = {}", request.getRequestURI(), token);
+
+        try {
+            if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+            // token이 필요한 api에 토큰이 없거나 유효하지 않는 경우 에러 발생 CustomAuthenticationEntryPoint
+            // filter에서 직접 throw new exception을 할 수 없으니 위임한다
+            request.setAttribute(FilterException.JWT_ERROR.getErrorName(), "Invalid Token");
         }
 
         filterChain.doFilter(request,response);

@@ -21,9 +21,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        String errorMessage = request.getAttribute(FilterException.JWT_ERROR.getErrorName()).toString();
+         String errorMessage = request.getAttribute(FilterException.JWT_ERROR.getErrorName()).toString();
         log.debug("@@ CustomAuthenticationEntryPoint.commence");
-        response.setStatus(401);
+
+        response.setStatus(400);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         try (OutputStream os = response.getOutputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();

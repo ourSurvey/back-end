@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 public class AopLogger {
-    @Pointcut("within(com.oursurvey.controller..*)")
+    @Pointcut("within(com.oursurvey.controller..*)" +
+            " || within(@org.springframework.stereotype.Service *)")
     public void onRequest() { }
 
     @Around("onRequest()")
@@ -53,11 +54,11 @@ public class AopLogger {
             params = " [" + paramMapToString(paramMap) + "]";
         }
 
-        log.info("{} Request -> {} {}, params = {}, body = {}", declareClass, request.getMethod(), request.getRequestURI(), params, point.getArgs());
+        log.info("{} {} Request = {} {}, params = {}, body = {}", getPrefix(declareClass, true), declareClass, request.getMethod(), request.getRequestURI(), params, point.getArgs());
     }
 
     private void printResponseLog(String declareClass, Object result) {
-        log.info("{} Response -> {} ", declareClass, result);
+        log.info("{} Response = {} ", getPrefix(declareClass, false), declareClass, result);
     }
 
     private void printExceptionLog(String declareClass, Throwable throwable) {
@@ -70,5 +71,18 @@ public class AopLogger {
                 .map(entry -> String.format("%s -> (%s)",
                         entry.getKey(), Joiner.on(",").join(entry.getValue())))
                 .collect(Collectors.joining(", "));
+    }
+
+    private String getPrefix(String declareClass, boolean isRequest) {
+        String prefix;
+        if (declareClass.contains("Controller")) {
+            prefix = "@@ ";
+        } else if (declareClass.contains("Service")) {
+            prefix = isRequest ? "--->" : "<---";
+        } else {
+            prefix = isRequest ? "--->--->" : "<---<---";
+        }
+
+        return prefix;
     }
 }

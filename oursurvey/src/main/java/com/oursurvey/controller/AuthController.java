@@ -157,16 +157,21 @@ public class AuthController {
 
     // 인증번호 발송
     @PostMapping("/take")
-    public MyResponse take(@RequestBody AuthDto.EmailDto dto) throws Exception {
-        UserDto.Basic user = userService.findByEmail(dto.getEmail());
-        String email = user.getEmail();
+        public MyResponse take(@RequestBody AuthDto.EmailDto dto) throws Exception {
+            UserDto.Basic user = userService.findByEmail(dto.getEmail());
+            String email = user.getEmail();
 
-        String code = mailUtil.generateAuthCode();
-        mailUtil.sendMail(email, "인증코드", code);
+            String code = mailUtil.generateAuthCode();
+            mailUtil.sendMail(email, "인증코드", code);
 
-        ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
-        return new MyResponse();
+            ValueOperations<String, Object> vop = redis.opsForValue();
+            vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
+
+            AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
+                    .token(tokenProvider.createToken(email, TokenType.TOKEN_EXPIRE_5MINUTE))
+                    .build();
+
+        return new MyResponse().setData(responseData);
     }
 
     // 인증번호 확인
@@ -180,23 +185,6 @@ public class AuthController {
         }
 
         return new MyResponse();
-    }
-
-    // 인증번호 발송
-    @PostMapping("/findpwd")
-    public MyResponse findpwd(@RequestBody AuthDto.EmailDto dto) throws Exception {
-        String email = dto.getEmail();
-        String code = mailUtil.generateAuthCode();
-        mailUtil.sendMail(email, "인증코드", code);
-
-        ValueOperations<String, Object> vop = redis.opsForValue();
-        vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
-
-        AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
-                .token(tokenProvider.createToken(email, TokenType.TOKEN_EXPIRE_5MINUTE))
-                .build();
-
-        return new MyResponse().setData(responseData);
     }
 
     @PostMapping("/resetpwd")
