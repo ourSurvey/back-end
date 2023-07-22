@@ -61,7 +61,6 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MailUtil mailUtil;
 
-
     @PostMapping("/login")
     public MyResponse login(HttpServletRequest request, @RequestBody AuthDto.Login dto) throws Exception {
         UserDto.Basic user = userService.findByEmail(dto.getEmail());
@@ -116,6 +115,36 @@ public class AuthController {
         return new MyResponse().setData(responseData);
     }
 
+    // 회원가입 전 인증번호 발송
+    @PostMapping("/send-mail")
+    public MyResponse sendMail(@RequestBody AuthDto.EmailDto dto) throws Exception {
+        String email = dto.getEmail();
+        if (userRepo.existsByEmail(email)) {
+            throw new DuplicateEmailException("Already Exists Email");
+        }
+
+        String code = mailUtil.generateAuthCode();
+        mailUtil.sendMail(email, "인증코드", code);
+
+        ValueOperations<String, Object> vop = redis.opsForValue();
+        vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
+
+        return new MyResponse();
+    }
+
+    // 회원가입 전 인증번호 인증
+    @PostMapping("/certified")
+    public MyResponse certified(@RequestBody AuthDto.Certified dto) throws Exception {
+        ValueOperations<String, Object> vop = redis.opsForValue();
+        String code = String.valueOf(vop.get(MAIL_PREFIX_KEY + dto.getEmail()));
+
+        if (!StringUtils.hasText(code) || !code.equals(dto.getCode())) {
+            throw new CertifiedException("Invalid or Not Matched Code");
+        }
+
+        return new MyResponse();
+    }
+
     @PostMapping("/join")
     public MyResponse join(@RequestBody AuthDto.Join dto) {
         Optional<User> optional = userRepo.findByEmail(dto.getEmail());
@@ -155,37 +184,23 @@ public class AuthController {
         return new MyResponse();
     }
 
-    // 인증번호 발송
-    @PostMapping("/take")
-        public MyResponse take(@RequestBody AuthDto.EmailDto dto) throws Exception {
-            UserDto.Basic user = userService.findByEmail(dto.getEmail());
-            String email = user.getEmail();
+    @PostMapping("/findpwd")
+    public MyResponse findpwd(@RequestBody AuthDto.EmailDto dto) throws Exception {
+        String email = userService.findByEmail(dto.getEmail()).getEmail();
 
-            String code = mailUtil.generateAuthCode();
-            mailUtil.sendMail(email, "인증코드", code);
+        String code = mailUtil.generateAuthCode();
+        mailUtil.sendMail(email, "인증코드", code);
 
-            ValueOperations<String, Object> vop = redis.opsForValue();
-            vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
+        ValueOperations<String, Object> vop = redis.opsForValue();
+        vop.set(MAIL_PREFIX_KEY + email, code, 180, TimeUnit.SECONDS);
 
-            AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
-                    .token(tokenProvider.createToken(email, TokenType.TOKEN_EXPIRE_5MINUTE))
-                    .build();
+        AuthDto.FindPasswordResponse responseData = AuthDto.FindPasswordResponse.builder()
+                .token(tokenProvider.createToken(email, TokenType.TOKEN_EXPIRE_5MINUTE))
+                .build();
 
         return new MyResponse().setData(responseData);
     }
 
-    // 인증번호 확인
-    @PostMapping("/certified")
-    public MyResponse certified(@RequestBody AuthDto.Certified dto) throws Exception {
-        ValueOperations<String, Object> vop = redis.opsForValue();
-        String code = String.valueOf(vop.get(MAIL_PREFIX_KEY + dto.getEmail()));
-
-        if (!StringUtils.hasText(code) || !code.equals(dto.getCode())) {
-            throw new CertifiedException("Invalid or Not Matched Code");
-        }
-
-        return new MyResponse();
-    }
 
     @PostMapping("/resetpwd")
     public MyResponse resetpwd(@RequestBody AuthDto.Resetpwd dto) throws Exception {
